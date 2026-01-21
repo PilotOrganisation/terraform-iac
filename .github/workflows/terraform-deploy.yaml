@@ -1,0 +1,57 @@
+name: "Workflow to deploy Azure infra using Terraform"
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+  ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+  ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+  TF_VERSION: 1.9.8
+  ARM_USE_OIDC: true
+
+permissions:
+  id-token: write
+  contents: read
+  
+jobs:
+  terraform-deploy:
+    runs-on: ubuntu-latest
+    env:
+      env_prefix: "demo"
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: ${{ env.TF_VERSION }}
+
+    - name: Terraform Init
+      run: |
+        cd terraform
+        terraform init
+
+    - name: Terraform Format
+      run: |
+        cd terraform
+        terraform fmt -check
+
+    - name: Terraform Validate
+      run: |
+        cd terraform
+        terraform validate
+
+    - name: Terraform Plan
+      run: |
+        cd terraform
+        terraform plan -var="vm_admin_password=${{ secrets.VM_ADMIN_PASSWORD }}" -var-file="env/${{ env.env_prefix }}/${{ env.env_prefix }}-values.tfvars"
+
+    - name: Terraform Apply
+      run: |
+        cd terraform
+        terraform apply -var="vm_admin_password=${{ secrets.VM_ADMIN_PASSWORD }}" -var-file="env/${{ env.env_prefix }}/${{ env.env_prefix }}-values.tfvars" -auto-approve
