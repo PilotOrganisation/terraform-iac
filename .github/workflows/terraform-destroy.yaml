@@ -29,7 +29,11 @@ jobs:
         terraform_version: ${{ env.TF_VERSION }}
 
     - name: Terraform Init
-      run: terraform init
+      run: |
+        cd terraform
+        terraform init
 
     - name: Terraform Destroy
-      run: terraform destroy -var="vm_admin_password=${{ secrets.VM_ADMIN_PASSWORD }}" -var-file="env/${{ env.env_prefix }}/${{ env.env_prefix }}-values.tfvars" -auto-approve
+      run: |
+        cd terraform
+        terraform destroy -var="vm_admin_password=${{ secrets.VM_ADMIN_PASSWORD }}" -var-file="env/${{ env.env_prefix }}/${{ env.env_prefix }}-values.tfvars" -auto-approve
