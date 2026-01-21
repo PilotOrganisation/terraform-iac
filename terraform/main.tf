@@ -22,6 +22,44 @@ resource "azurerm_subnet" "subnet" {
   address_prefixes     = var.subnet_cidir
 }
 
+# Network Security Group
+resource "azurerm_network_security_group" "nsg" {
+  name                = "${var.env_prefix}-nsg"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  tags                = var.tags
+
+  security_rule {
+    name                       = "Allow-HTTP"
+    priority                   = 100
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "80"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+  security_rule {
+    name                       = "Allow-SSH"
+    priority                   = 110
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "22"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+}
+
+# Associate NSG with Subnet
+resource "azurerm_subnet_network_security_group_association" "subnet_nsg_assoc" {
+  subnet_id                 = azurerm_subnet.subnet.id
+  network_security_group_id = azurerm_network_security_group.nsg.id
+}
+
 # Public IP
 resource "azurerm_public_ip" "pip" {
   name                = var.public_ip_name
@@ -77,7 +115,9 @@ resource "azurerm_linux_virtual_machine" "vm" {
 #!/bin/bash
 apt-get update -y
 apt-get install -y nginx
-echo "<h1>Hello from Azure VM using NGINX & Terraform 🚀</h1>" > /var/www/html/index.html
+echo "<h2>Hello Human!, I'm from Azure VM using NGINX</h2>" > /var/www/html/index.html
+echo "<h2>Was built with Terraform and deployed using GitHub Actions Workflow</h2>" >> /var/www/html/index.html
+echo "<h3>- Have a great day and see you again!</h3>" >> /var/www/html/index.html
 systemctl enable nginx
 systemctl restart nginx
 EOF
