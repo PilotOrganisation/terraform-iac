@@ -17,7 +17,8 @@ permissions:
 jobs:
   terraform-deploy:
     runs-on: ubuntu-latest
-
+    env:
+      env_prefix: "demo"
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
@@ -31,4 +32,4 @@ jobs:
       run: terraform init
 
     - name: Terraform Destroy
-      run: terraform destroy -auto-approve
+      run: terraform destroy -var="vm_admin_password=${{ secrets.VM_ADMIN_PASSWORD }}" -var-file="env/${{ env.env_prefix }}/${{ env.env_prefix }}-values.tfvars" -auto-approve
