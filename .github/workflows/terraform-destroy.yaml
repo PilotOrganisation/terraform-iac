@@ -1,8 +1,6 @@
-name: "Workflow to deploy Azure infra using Terraform"
+name: "Workflow to destroy Azure infra using Terraform"
 
 on:
-  push:
-    branches: [ main ]
   workflow_dispatch:
 
 env:
@@ -32,14 +30,5 @@ jobs:
     - name: Terraform Init
       run: terraform init
 
-    - name: Terraform Format
-      run: terraform fmt -check
-
-    - name: Terraform Validate
-      run: terraform validate
-
-    - name: Terraform Plan
-      run: terraform plan -var="vm_admin_password=${{ secrets.VM_ADMIN_PASSWORD }}" -var-file="env/demo/demo-values.tfvars"
-
-    - name: Terraform Apply
-      run: terraform apply -var="vm_admin_password=${{ secrets.VM_ADMIN_PASSWORD }}" -var-file="env/demo/demo-values.tfvars" -auto-approve
+    - name: Terraform Destroy
+      run: terraform destroy -auto-approve
