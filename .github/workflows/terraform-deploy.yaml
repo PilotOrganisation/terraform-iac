@@ -19,6 +19,8 @@ permissions:
 jobs:
   terraform-deploy:
     runs-on: ubuntu-latest
+    env:
+      env_prefix: "demo"
 
     steps:
     - name: Checkout repository
@@ -47,9 +49,9 @@ jobs:
     - name: Terraform Plan
       run: |
         cd terraform
-        terraform plan -var="vm_admin_password=${{ secrets.VM_ADMIN_PASSWORD }}" -var-file="../env/demo/demo-values.tfvars"
+        terraform plan -var="vm_admin_password=${{ secrets.VM_ADMIN_PASSWORD }}" -var-file="env/${{ env.env_prefix }}/${{ env.env_prefix }}-values.tfvars"
 
     - name: Terraform Apply
       run: |
         cd terraform
-        terraform apply -var="vm_admin_password=${{ secrets.VM_ADMIN_PASSWORD }}" -var-file="../env/demo/demo-values.tfvars" -auto-approve
+        terraform apply -var="vm_admin_password=${{ secrets.VM_ADMIN_PASSWORD }}" -var-file="env/${{ env.env_prefix }}/${{ env.env_prefix }}-values.tfvars" -auto-approve
