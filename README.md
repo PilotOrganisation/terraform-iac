@@ -1,112 +1,77 @@
-# Terraform IAC POC
+# Terraform Azure Infrastructure Setup
 
-This project demonstrates Infrastructure as Code (IAC) using Terraform to provision and manage Azure resources. The configuration provisions a resource group, a storage account, and a storage container in Azure.
-
-## Features
-
-- Creates an Azure Resource Group.
-- Deploys an Azure Storage Account.
-- Creates a private Storage Container within the Storage Account.
-- Uses Terraform's remote backend for state management.
+This repository contains Terraform configuration files to deploy an Azure infrastructure that includes a resource group, virtual network, subnet, public IP, network interface, and a Linux virtual machine running NGINX.
 
 ## Prerequisites
 
-Before using this project, ensure you have the following:
+- [Terraform](https://www.terraform.io/downloads.html) installed on your machine.
+- An Azure account with the necessary permissions to create resources.
+- Azure CLI installed and configured, or service principal credentials stored in GitHub secrets.
 
-1. **Terraform**: Install Terraform (v1.3 or later).
-2. **Azure CLI**: Install the Azure CLI and authenticate using `az login`.
-3. **Azure Subscription**: Ensure you have an active Azure subscription.
-4. **Backend Configuration**: Update the backend configuration in `provider.tf` with your Azure storage details.
-
-## Project Structure
+## Directory Structure
 
 ```
-terraform-iac-poc/
-├── .gitignore                # Files and directories to ignore in version control
-├── main.tf                   # Main Terraform configuration
-├── provider.tf               # Provider and backend configuration
-├── variables.tf              # Input variables for the project
-├── README.md                 # Project documentation
+.
+├── .gitignore
+├── .terraform.lock.hcl
+├── env-values.tfvars
+├── main.tf
+├── outputs.tf
+├── provider.tf
+├── variables.tf
+└── .github/
+    └── workflows/
+        └── terraform-deploy.yaml
 ```
+
+## Configuration Files
+
+- **`provider.tf`**: Configures the Azure provider and backend for storing the Terraform state.
+- **`variables.tf`**: Defines the variables used in the Terraform configuration.
+- **`main.tf`**: Contains the main infrastructure resources to be created.
+- **`outputs.tf`**: Specifies the outputs from the Terraform deployment.
+- **`env-values.tfvars`**: Contains environment-specific variable values.
+- **`.github/workflows/terraform-deploy.yaml`**: GitHub Actions workflow for automating the deployment process.
 
 ## Usage
 
-Follow these steps to deploy the resources:
-
-1. **Clone the Repository**:
-   ```bash
-   git clone https://github.com/your-repo/terraform-iac-poc.git
-   cd terraform-iac-poc
+1. **Clone the repository**:
+   ```sh
+   git clone <repository-url>
+   cd <repository-directory>
    ```
 
-2. **Initialize Terraform**:
-   Initialize the Terraform working directory and download the required provider plugins.
-   ```bash
+2. **Set up your Azure credentials**:
+   Ensure that your Azure credentials are set in your environment or as GitHub secrets for the GitHub Actions workflow.
+
+3. **Initialize Terraform**:
+   ```sh
    terraform init
    ```
 
-3. **Validate the Configuration**:
-   Ensure the configuration is valid.
-   ```bash
+4. **Validate the configuration**:
+   ```sh
    terraform validate
    ```
 
-4. **Plan the Deployment**:
-   Generate and review an execution plan.
-   ```bash
-   terraform plan
+5. **Plan the deployment**:
+   ```sh
+   terraform plan -var-file="env-values.tfvars"
    ```
 
-5. **Apply the Configuration**:
-   Deploy the resources to Azure.
-   ```bash
-   terraform apply
+6. **Apply the configuration**:
+   ```sh
+   terraform apply -var-file="env-values.tfvars"
    ```
 
-6. **Destroy the Resources** (Optional):
-   If you want to clean up the resources, run:
-   ```bash
-   terraform destroy
-   ```
+## Outputs
 
-## Variables
+After a successful deployment, you will see an output message indicating the URL where the NGINX application is accessible.
 
-The following variables are defined in `variables.tf`:
+## GitHub Actions
 
-| Variable Name                    | Description                          | Default Value             |
-|----------------------------------|--------------------------------------|---------------------------|
-| `resource_group_name`            | Name of the resource group           | `tf-iac-poc-rg`           |
-| `location`                       | Azure region for resource deployment | `East US`                 |
-| `storage_account_name`           | Name of the storage account          | `terraformiacpocsa`       |
-| `storage_account_container_name` | Name of the storage container        | `iacpoccontainer`         |
-| `tags`                           | Tags to apply to resources           | `{ environment = "poc" }` |
-
-## Backend Configuration
-
-The Terraform state is stored remotely in an Azure Storage Account. Update the `provider.tf` file with your backend details:
-
-```hcl
-backend "azurerm" {
-  resource_group_name  = "your-tfstate-rg"
-  storage_account_name = "your-tfstate-sa"
-  container_name       = "your-tfstate-container"
-  key                  = "terraform.tfstate"
-}
-```
+The repository includes a GitHub Actions workflow that automatically deploys the infrastructure when changes are pushed to the `main` branch. Ensure that the necessary secrets are configured in your GitHub repository settings.
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
-
-## Contributing
-
-Contributions are welcome! Feel free to open issues or submit pull requests.
-
-## Author
-
-**Chandra Srinath**  
-For any questions, feel free to reach out.
-
----
-
-Happy Terraforming! 🚀
+This project is licensed under the Mozilla Public License Version 2.0. See the [LICENSE](.terraform/providers/registry.terraform.io/hashicorp/azurerm/4.57.0/windows_amd64/LICENSE.txt) file for details.
