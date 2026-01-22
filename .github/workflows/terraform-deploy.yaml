@@ -53,6 +53,9 @@ jobs:
     needs: terraform-plan
     runs-on: ubuntu-latest
     environment: security-check
+    permissions:
+      id-token: write
+      contents: read
     env:
       env_prefix: "demo"
     steps:
