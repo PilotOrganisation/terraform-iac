@@ -1,374 +1,309 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Azure Infrastructure Dashboard</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Infra & CI/CD Dashboard — Terraform · GitHub · Azure</title>
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-        .container {
-            max-width: 1200px;
-            width: 100%;
-        }
-
-        .header {
-            text-align: center;
-            color: white;
-            margin-bottom: 40px;
-            animation: slideDown 0.6s ease-out;
-        }
-
-        .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        }
-
-        .header p {
-            font-size: 1.1rem;
-            opacity: 0.9;
-        }
-
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 25px;
-            margin-bottom: 30px;
-        }
-
-        .card {
-            background: white;
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            animation: fadeIn 0.6s ease-out;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
-        }
-
-        .card-icon {
-            font-size: 2.5rem;
-            margin-bottom: 15px;
-        }
-
-        .card h2 {
-            color: #667eea;
-            font-size: 1.5rem;
-            margin-bottom: 10px;
-        }
-
-        .card p {
-            color: #666;
-            line-height: 1.6;
-            margin-bottom: 15px;
-        }
-
-        .card-value {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #764ba2;
-            background: #f0f0f0;
-            padding: 10px;
-            border-radius: 6px;
-            text-align: center;
-        }
-
-        .status-badge {
-            display: inline-block;
-            background: #4caf50;
-            color: white;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            margin-top: 10px;
-        }
-
-        .info-section {
-            background: white;
-            border-radius: 12px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            animation: fadeIn 0.8s ease-out;
-        }
-
-        .info-section h3 {
-            color: #667eea;
-            margin-bottom: 20px;
-            font-size: 1.4rem;
-        }
-
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
-        }
-
-        .info-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px;
-            background: #f9f9f9;
-            border-radius: 8px;
-            border-left: 4px solid #667eea;
-        }
-
-        .info-item strong {
-            color: #333;
-        }
-
-        .info-item span {
-            color: #666;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-top: 30px;
-        }
-
-        button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 25px;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.6);
-        }
-
-        button:active {
-            transform: scale(0.98);
-        }
-
-        .footer {
-            text-align: center;
-            color: white;
-            margin-top: 40px;
-            padding: 20px;
-        }
-
-        .footer p {
-            opacity: 0.9;
-        }
-
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @media (max-width: 768px) {
-            .header h1 {
-                font-size: 1.8rem;
-            }
-
-            .cards-grid {
-                grid-template-columns: 1fr;
-                gap: 15px;
-            }
-
-            .card {
-                padding: 20px;
-            }
-
-            button {
-                width: 100%;
-            }
-        }
-    </style>
+  <style>
+    :root{
+      --bg:#0f1724;
+      --card:#0b1220;
+      --muted:#94a3b8;
+      --accent:#7c3aed;
+      --glass: rgba(255,255,255,0.04);
+      --glass-2: rgba(255,255,255,0.02);
+      --success:#16a34a;
+      --danger:#ef4444;
+    }
+    *{box-sizing:border-box;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;}
+    html,body{height:100%;margin:0;background:linear-gradient(180deg,#071126 0%, #071827 60%);color:#e6eef8}
+    .app{display:grid;grid-template-columns:280px 1fr;height:100vh;gap:20px;padding:24px}
+    .sidebar{background:linear-gradient(180deg,var(--card),#041226);border-radius:12px;padding:18px;box-shadow:0 8px 30px rgba(2,6,23,0.7)}
+    .logo{font-weight:700;color:var(--accent);font-size:1.05rem;margin-bottom:18px;display:flex;gap:8px;align-items:center}
+    .nav{margin-top:12px;display:flex;flex-direction:column;gap:8px}
+    .nav a{color:var(--muted);text-decoration:none;padding:10px;border-radius:8px;display:flex;gap:10px;align-items:center}
+    .nav a.active, .nav a:hover{background:var(--glass);color:#fff}
+    .panel{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:12px;padding:18px;box-shadow:0 8px 30px rgba(2,6,23,0.6)}
+    header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+    .title{font-size:1.25rem;font-weight:600}
+    .subtitle{color:var(--muted);font-size:0.9rem}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:18px}
+    .card{padding:16px;border-radius:10px;background:var(--glass-2);display:flex;flex-direction:column;gap:8px}
+    .card .k{color:var(--muted);font-size:0.85rem}
+    .card .v{font-weight:700;font-size:1.05rem}
+    .main{display:flex;flex-direction:column;gap:16px}
+    .split{display:grid;grid-template-columns:1fr 420px;gap:16px}
+    .code{background:#071827;padding:12px;border-radius:8px;overflow:auto;font-family:monospace;font-size:12px;color:#cfe8ff}
+    .pill{display:inline-block;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,0.04);font-size:12px}
+    .list{display:flex;flex-direction:column;gap:10px}
+    .resource{display:flex;justify-content:space-between;align-items:center;padding:10px;border-radius:8px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.02))}
+    .btn{background:linear-gradient(90deg,var(--accent),#3b82f6);border:none;color:white;padding:10px 14px;border-radius:8px;cursor:pointer}
+    footer{color:var(--muted);font-size:12px;text-align:center;padding-top:10px}
+    @media (max-width:1000px){.app{grid-template-columns:1fr};.grid{grid-template-columns:1fr}.split{grid-template-columns:1fr}}
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🚀 Azure Infrastructure Dashboard</h1>
-            <p>Terraform Deployed Application on NGINX</p>
+  <div class="app">
+    <aside class="sidebar panel">
+      <div class="logo">⚡ Infra Studio</div>
+      <div class="subtitle">Terraform · GitHub Actions · Azure</div>
+
+      <nav class="nav" aria-label="Main navigation">
+        <a class="active" data-section="overview">Overview</a>
+        <a data-section="terraform">Terraform</a>
+        <a data-section="workflows">GitHub Workflows</a>
+        <a data-section="azure">Azure Infra</a>
+        <a data-section="files">Files</a>
+      </nav>
+
+      <div style="margin-top:18px">
+        <div style="display:flex;gap:8px;align-items:center">
+          <div class="pill">env: demo</div>
+          <div class="pill">state: azurerm backend</div>
         </div>
 
-        <div class="cards-grid">
-            <div class="card">
-                <div class="card-icon">☁️</div>
-                <h2>Cloud Platform</h2>
-                <p>Running on Microsoft Azure infrastructure with automated deployment via Terraform.</p>
-                <div class="card-value">Microsoft Azure</div>
-                <div class="status-badge">✓ Active</div>
+        <div style="margin-top:14px;color:var(--muted);font-size:13px">
+          Quick links
+          <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px">
+            <a href="../provider.tf" style="color:var(--muted);text-decoration:none">provider.tf</a>
+            <a href="../main.tf" style="color:var(--muted);text-decoration:none">main.tf</a>
+            <a href="../variables.tf" style="color:var(--muted);text-decoration:none">variables.tf</a>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="panel">
+        <header>
+          <div>
+            <div class="title">Terraform + CI/CD + Azure Dashboard</div>
+            <div class="subtitle">At-a-glance insights for this repo</div>
+          </div>
+          <div>
+            <button class="btn" onclick="refreshData()">Refresh</button>
+          </div>
+        </header>
+
+        <div class="grid">
+          <div class="card">
+            <div class="k">Resource Group</div>
+            <div class="v" id="rgName">demo-nginx-rg</div>
+            <div class="k">Region</div>
+            <div class="v" id="region">Central India</div>
+          </div>
+
+          <div class="card">
+            <div class="k">VM</div>
+            <div class="v" id="vmName">nginx-vm</div>
+            <div class="k">Size</div>
+            <div class="v" id="vmSize">Standard_B2ats_v2</div>
+          </div>
+
+          <div class="card">
+            <div class="k">Networking</div>
+            <div class="v" id="vnetName">demo-nginx-vnet</div>
+            <div class="k">Public IP</div>
+            <div class="v" id="pip">nginx-pip</div>
+          </div>
+        </div>
+
+        <div class="split">
+          <section class="panel">
+            <h3 style="margin:0 0 12px 0">Overview</h3>
+            <div style="display:flex;gap:12px;flex-direction:column">
+              <div class="panel" style="padding:12px">
+                <strong>What this dashboard surfaces</strong>
+                <ul style="color:var(--muted);margin-top:8px">
+                  <li>Terraform resources & variables (from <code>main.tf</code>, <code>variables.tf</code>)</li>
+                  <li>CI pipeline steps (from GitHub workflows)</li>
+                  <li>Azure infra summary (RG, VNet, Subnet, NSG, VM, PIP)</li>
+                </ul>
+              </div>
+
+              <div class="panel" style="padding:12px">
+                <strong>Actions</strong>
+                <div style="display:flex;gap:8px;margin-top:8px">
+                  <button class="btn" onclick="openFile('terraform/main.tf')">Open main.tf</button>
+                  <button class="btn" onclick="openFile('.github/workflows/terraform-deploy.yaml')">Open deploy workflow</button>
+                </div>
+              </div>
+
+              <div class="panel" style="padding:12px">
+                <strong>Terraform variables (selected)</strong>
+                <div style="display:flex;gap:10px;margin-top:8px;flex-wrap:wrap">
+                  <div class="pill">env_prefix: demo</div>
+                  <div class="pill">vm_size: Standard_B2ats_v2</div>
+                  <div class="pill">vm_admin_username: azureuser</div>
+                </div>
+              </div>
             </div>
+          </section>
 
-            <div class="card">
-                <div class="card-icon">🔧</div>
-                <h2>Infrastructure as Code</h2>
-                <p>Provisioned using Terraform for consistent and repeatable deployments.</p>
-                <div class="card-value">Terraform v1.9.8+</div>
-                <div class="status-badge">✓ Deployed</div>
+          <aside class="panel">
+            <h4 style="margin:0 0 12px 0">Live Checks</h4>
+            <div class="list">
+              <div class="resource">
+                <div>
+                  <div style="font-weight:600">Terraform Init</div>
+                  <div style="color:var(--muted);font-size:12px">Checks for required providers & backend</div>
+                </div>
+                <div style="text-align:right">
+                  <div style="font-weight:700;color:#ffd166">Pending</div>
+                </div>
+              </div>
+
+              <div class="resource">
+                <div>
+                  <div style="font-weight:600">GitHub Workflow: terraform-deploy</div>
+                  <div style="color:var(--muted);font-size:12px">Plan → Manual security-check → Apply</div>
+                </div>
+                <div><div style="font-weight:700;color:#34d399">Configured</div></div>
+              </div>
+
+              <div class="resource">
+                <div>
+                  <div style="font-weight:600">State Backend</div>
+                  <div style="color:var(--muted);font-size:12px">Azure storage: terraformiacpoctfstatesa / tfstatecontainer</div>
+                </div>
+                <div><div style="font-weight:700;color:#60a5fa">azurerm</div></div>
+              </div>
             </div>
+          </aside>
+        </div>
+      </div>
 
-            <div class="card">
-                <div class="card-icon">📦</div>
-                <h2>Web Server</h2>
-                <p>High-performance NGINX web server serving this application.</p>
-                <div class="card-value">NGINX</div>
-                <div class="status-badge">✓ Running</div>
+      <div class="panel">
+        <h3 style="margin:0 0 12px 0">Deep Insights</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="panel">
+            <strong>Terraform Resources</strong>
+            <div style="margin-top:10px" id="resourcesList">
+              <!-- resources injected -->
             </div>
-        </div>
-
-        <div class="info-section">
-            <h3>📋 Deployment Information</h3>
-            <div class="info-grid">
-                <div class="info-item">
-                    <strong>Region:</strong>
-                    <span>Central India</span>
-                </div>
-                <div class="info-item">
-                    <strong>Resource Group:</strong>
-                    <span>demo-nginx-rg</span>
-                </div>
-                <div class="info-item">
-                    <strong>VM Size:</strong>
-                    <span>Standard_B2ats_v2</span>
-                </div>
-                <div class="info-item">
-                    <strong>OS:</strong>
-                    <span>Ubuntu 22.04 LTS</span>
-                </div>
-                <div class="info-item">
-                    <strong>Environment:</strong>
-                    <span>demo</span>
-                </div>
-                <div class="info-item">
-                    <strong>Deployment Method:</strong>
-                    <span>GitHub Actions</span>
-                </div>
+            <div style="margin-top:12px;color:var(--muted);font-size:13px">
+              Click any resource to open <code>main.tf</code> for the definition.
             </div>
-        </div>
+          </div>
 
-        <div class="info-section">
-            <h3>🎯 Features</h3>
-            <div class="info-grid">
-                <div class="info-item">
-                    <strong>✓</strong>
-                    <span>Automated Infrastructure Provisioning</span>
-                </div>
-                <div class="info-item">
-                    <strong>✓</strong>
-                    <span>Network Security Groups (NSG)</span>
-                </div>
-                <div class="info-item">
-                    <strong>✓</strong>
-                    <span>Public IP for External Access</span>
-                </div>
-                <div class="info-item">
-                    <strong>✓</strong>
-                    <span>CI/CD with GitHub Actions</span>
-                </div>
-                <div class="info-item">
-                    <strong>✓</strong>
-                    <span>Terraform State Management</span>
-                </div>
-                <div class="info-item">
-                    <strong>✓</strong>
-                    <span>Infrastructure as Code Best Practices</span>
-                </div>
+          <div class="panel">
+            <strong>GitHub Workflows</strong>
+            <div style="margin-top:10px">
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <div style="padding:10px;border-radius:8px;background:var(--glass)">terraform-deploy.yaml — Plan & Apply (manual security check)</div>
+                <div style="padding:10px;border-radius:8px;background:var(--glass)">terraform-destroy.yaml — Destroy workflow (manual dispatch)</div>
+              </div>
             </div>
+            <div style="margin-top:10px">
+              <small class="subtitle">Open files:</small>
+              <div style="display:flex;gap:8px;margin-top:6px">
+                <button class="btn" onclick="openFile('.github/workflows/terraform-deploy.yaml')">Open deploy</button>
+                <button class="btn" onclick="openFile('.github/workflows/terraform-destroy.yaml')">Open destroy</button>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div class="button-group">
-            <button onclick="reloadPage()">🔄 Refresh</button>
-            <button onclick="showInfo()">ℹ️ More Info</button>
-            <button onclick="copyInfo()">📋 Copy Details</button>
+        <div style="margin-top:12px" class="panel">
+          <strong>File preview — main.tf (snippet)</strong>
+          <pre class="code" id="mainTfSnippet">
+# snippet loaded...
+          </pre>
         </div>
+      </div>
 
-        <div class="footer">
-            <p>Built with ❤️ using Terraform, Azure, and GitHub Actions</p>
-            <p style="font-size: 0.9rem; margin-top: 10px;">Deployed: <span id="deployTime"></span></p>
-        </div>
-    </div>
+      <footer>
+        Repo: <a href="../../README.md" style="color:var(--muted)">README.md</a> • Provider: <a href="../provider.tf" style="color:var(--muted)">provider.tf</a>
+      </footer>
+    </main>
+  </div>
 
-    <script>
-        // Set deployment time
-        function initializeDeploymentTime() {
-            const now = new Date();
-            document.getElementById('deployTime').textContent = now.toLocaleString();
-        }
+  <script>
+    // Static model of this workspace (populated with known values from repo files).
+    const workspace = {
+      provider: {
+        subscription_id: "f805bc8d-1c98-4d3b-85d2-f2adea26cb5b",
+        backend_storage: { account: "terraformiacpoctfstatesa", container: "tfstatecontainer", key: "terraform.tfstate" }
+      },
+      terraform: {
+        env_prefix: "demo",
+        resource_group: "nginx-rg",
+        computed_rg: "demo-nginx-rg",
+        location: "Central India",
+        vnet: "nginx-vnet",
+        vnet_full: "demo-nginx-vnet",
+        subnet: "nginx-subnet",
+        vm: { name: "nginx-vm", size: "Standard_B2ats_v2", admin: "azureuser" },
+        public_ip: "nginx-pip",
+        nic: "nginx-nic",
+        tags: { deployed_by: "terraform", owner: "github", environment: "demo" },
+        workflows: ["terraform-deploy.yaml","terraform-destroy.yaml"],
+        resources: [
+          "azurerm_resource_group.rg",
+          "azurerm_virtual_network.vnet",
+          "azurerm_subnet.subnet",
+          "azurerm_network_security_group.nsg",
+          "azurerm_public_ip.pip",
+          "azurerm_network_interface.nic",
+          "azurerm_linux_virtual_machine.vm"
+        ]
+      }
+    };
 
-        function reloadPage() {
-            location.reload();
-        }
+    // Populate UI
+    document.getElementById('rgName').textContent = workspace.terraform.computed_rg;
+    document.getElementById('region').textContent = workspace.terraform.location;
+    document.getElementById('vnetName').textContent = workspace.terraform.vnet_full;
+    document.getElementById('vmName').textContent = workspace.terraform.vm.name;
+    document.getElementById('vmSize').textContent = workspace.terraform.vm.size;
+    document.getElementById('pip').textContent = workspace.terraform.public_ip;
 
-        function showInfo() {
-            alert('🎉 Welcome to Azure Infrastructure Dashboard!\n\n' +
-                'This application is running on:\n' +
-                '• Cloud: Microsoft Azure\n' +
-                '• IaC: Terraform v1.9.8+\n' +
-                '• Web Server: NGINX\n' +
-                '• Region: Central India\n' +
-                '• CI/CD: GitHub Actions\n\n' +
-                'For more details, visit your Terraform configuration.');
-        }
+    const resourcesList = document.getElementById('resourcesList');
+    workspace.terraform.resources.forEach(r => {
+      const el = document.createElement('div');
+      el.className = 'resource';
+      el.innerHTML = `<div style="font-weight:600">${r}</div><div><button class="btn" onclick="openFile('terraform/main.tf')">View</button></div>`;
+      resourcesList.appendChild(el);
+    });
 
-        function copyInfo() {
-            const info = `Azure Infrastructure Dashboard\n` +
-                `Cloud: Microsoft Azure\n` +
-                `Region: Central India\n` +
-                `VM Size: Standard_B2ats_v2\n` +
-                `OS: Ubuntu 22.04 LTS\n` +
-                `Web Server: NGINX\n` +
-                `IaC Tool: Terraform v1.9.8+\n` +
-                `CI/CD: GitHub Actions\n` +
-                `Environment: demo`;
-            
-            navigator.clipboard.writeText(info).then(() => {
-                alert('✓ Information copied to clipboard!');
-            }).catch(() => {
-                alert('Could not copy to clipboard');
-            });
-        }
+    // Load snippet of main.tf (small curated snippet based on repo)
+    document.getElementById('mainTfSnippet').textContent =
+`resource "azurerm_resource_group" "rg" {
+  name     = "\${var.env_prefix}-\${var.resource_group_name}"
+  location = var.location
+  tags     = var.tags
+}
 
-        // Initialize on page load
-        window.addEventListener('load', initializeDeploymentTime);
-    </script>
+resource "azurerm_linux_virtual_machine" "vm" {
+  name         = var.vm_name
+  resource_group_name = azurerm_resource_group.rg.name
+  size         = var.vm_size
+  admin_username = var.vm_admin_username
+  # ... custom_data installs nginx and deploys web-app/index.html ...
+}`;
+
+    // Navigation
+    document.querySelectorAll('.nav a').forEach(a=>{
+      a.addEventListener('click', ()=> {
+        document.querySelectorAll('.nav a').forEach(x=>x.classList.remove('active'));
+        a.classList.add('active');
+        // Minimal: scroll to panel or highlight (expandable)
+        alert('Section: ' + a.dataset.section + '\\nUse the sidebar quick links to open files.');
+      });
+    });
+
+    function openFile(path) {
+      // open file relative in new tab; VSCode will open local file if served by a preview server.
+      window.open(path, '_blank');
+    }
+
+    function refreshData() {
+      // Placeholder for future dynamic integrations (e.g. call a local backend to parse TF/HCL or GitHub API).
+      alert('Refresh triggered — this demo uses static workspace snapshot.\nTo enable live parsing, run a small local server that exposes HCL/Workflow summaries to this page.');
+    }
+  </script>
 </body>
 </html>
