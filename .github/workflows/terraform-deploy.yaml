@@ -1,8 +1,6 @@
 name: "Workflow to deploy Azure infra using Terraform"
 
 on:
-  push:
-    branches: [ main ]
   workflow_dispatch:
 
 env:
@@ -17,7 +15,7 @@ permissions:
   contents: read
   
 jobs:
-  terraform-deploy:
+  terraform-plan:
     runs-on: ubuntu-latest
     env:
       env_prefix: "demo"
@@ -51,6 +49,13 @@ jobs:
         cd terraform
         terraform plan -var="vm_admin_password=${{ secrets.VM_ADMIN_PASSWORD }}" -var-file="env/${{ env.env_prefix }}/${{ env.env_prefix }}-values.tfvars"
 
+  terraform-apply:
+    needs: terraform-plan
+    runs-on: ubuntu-latest
+    environment: security-check
+    env:
+      env_prefix: "demo"
+    steps:
     - name: Terraform Apply
       run: |
         cd terraform
