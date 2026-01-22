@@ -700,6 +700,364 @@
       color: var(--text-dark);
       font-weight: 700;
     }
+
+    /* ===== ANIMATIONS ===== */
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-12px); }
+    }
+
+    @keyframes slideInLeft {
+      from {
+        opacity: 0;
+        transform: translateX(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes slideInRight {
+      from {
+        opacity: 0;
+        transform: translateX(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes slideInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes shimmer {
+      0% {
+        background-position: -1000px 0;
+      }
+      100% {
+        background-position: 1000px 0;
+      }
+    }
+
+    @keyframes glow {
+      0%, 100% {
+        box-shadow: 0 0 10px rgba(99, 102, 241, 0.3);
+      }
+      50% {
+        box-shadow: 0 0 20px rgba(99, 102, 241, 0.6);
+      }
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    @keyframes fadeInScale {
+      from {
+        opacity: 0;
+        transform: scale(0.9);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    /* ===== ARCHITECTURE DIAGRAM ===== */
+    .architecture-container {
+      background: linear-gradient(135deg, rgba(224, 231, 255, 0.6), rgba(248, 250, 252, 0.6));
+      border-radius: 16px;
+      padding: 32px;
+      border: 1px solid var(--border-light);
+      margin: 24px 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .architecture-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.05), transparent 50%),
+                  radial-gradient(circle at 80% 80%, rgba(236, 72, 153, 0.05), transparent 50%);
+      pointer-events: none;
+    }
+
+    .architecture-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .resource-box {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(248, 250, 252, 0.7));
+      border: 2px solid var(--border-light);
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+      position: relative;
+      animation: slideInUp 0.6s ease forwards;
+      transition: var(--transition);
+      cursor: pointer;
+    }
+
+    .resource-box:nth-child(1) { animation-delay: 0s; }
+    .resource-box:nth-child(2) { animation-delay: 0.1s; }
+    .resource-box:nth-child(3) { animation-delay: 0.2s; }
+    .resource-box:nth-child(4) { animation-delay: 0.3s; }
+    .resource-box:nth-child(5) { animation-delay: 0.4s; }
+    .resource-box:nth-child(6) { animation-delay: 0.5s; }
+    .resource-box:nth-child(7) { animation-delay: 0.6s; }
+
+    .resource-box:hover {
+      border-color: var(--primary-bright);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 1), rgba(224, 231, 255, 0.9));
+      box-shadow: 0 12px 24px rgba(99, 102, 241, 0.2);
+      transform: translateY(-8px);
+    }
+
+    .resource-box-icon {
+      font-size: 2.5rem;
+      margin-bottom: 12px;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    .resource-box:nth-child(2) .resource-box-icon { animation-delay: 0.2s; }
+    .resource-box:nth-child(3) .resource-box-icon { animation-delay: 0.4s; }
+    .resource-box:nth-child(4) .resource-box-icon { animation-delay: 0.6s; }
+    .resource-box:nth-child(5) .resource-box-icon { animation-delay: 0.8s; }
+    .resource-box:nth-child(6) .resource-box-icon { animation-delay: 1s; }
+    .resource-box:nth-child(7) .resource-box-icon { animation-delay: 1.2s; }
+
+    .resource-box-name {
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--text-dark);
+      margin-bottom: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .resource-box-type {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      background: rgba(99, 102, 241, 0.08);
+      padding: 4px 8px;
+      border-radius: 4px;
+      display: inline-block;
+    }
+
+    /* ===== FLOW CONNECTORS ===== */
+    .flow-line {
+      position: absolute;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.3), transparent);
+      top: 50%;
+      animation: slideInRight 1.5s ease forwards;
+      opacity: 0;
+    }
+
+    /* ===== STAT COUNTER ===== */
+    .stat-counter {
+      animation: slideInUp 0.8s ease forwards;
+      opacity: 0;
+    }
+
+    .stat-counter:nth-child(1) { animation-delay: 0.1s; }
+    .stat-counter:nth-child(2) { animation-delay: 0.2s; }
+    .stat-counter:nth-child(3) { animation-delay: 0.3s; }
+
+    .stat-value-animated {
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ===== FEATURE BOX ===== */
+    .feature-box {
+      background: linear-gradient(135deg, rgba(224, 231, 255, 0.6), rgba(252, 231, 243, 0.6));
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid var(--border-light);
+      margin-bottom: 12px;
+      animation: slideInLeft 0.6s ease;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .feature-box-icon {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--primary-bright), var(--accent-1));
+      border-radius: 8px;
+      color: white;
+      flex-shrink: 0;
+      animation: bounce 2s ease-in-out infinite;
+    }
+
+    .feature-box-content {
+      flex: 1;
+    }
+
+    .feature-box-title {
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 4px;
+    }
+
+    .feature-box-desc {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    /* ===== CONNECTION MAP ===== */
+    .connection-map {
+      position: relative;
+      height: 300px;
+      background: linear-gradient(135deg, rgba(224, 231, 255, 0.3), rgba(248, 250, 252, 0.3));
+      border-radius: 12px;
+      border: 1px solid var(--border-light);
+      padding: 20px;
+      overflow: hidden;
+    }
+
+    .connection-node {
+      position: absolute;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(236, 72, 153, 0.1));
+      border: 2px solid var(--primary-bright);
+      font-size: 1.5rem;
+      animation: glow 2s ease-in-out infinite;
+    }
+
+    .connection-node.node-1 { top: 20px; left: 20px; animation-delay: 0s; }
+    .connection-node.node-2 { top: 50%; left: 20px; transform: translateY(-50%); animation-delay: 0.3s; }
+    .connection-node.node-3 { top: 20px; right: 20px; animation-delay: 0.6s; }
+    .connection-node.node-4 { bottom: 20px; right: 20px; animation-delay: 0.9s; }
+    .connection-node.node-5 { top: 50%; right: 20px; transform: translateY(-50%); animation-delay: 1.2s; }
+
+    /* ===== PULSE INDICATOR ===== */
+    .pulse-indicator {
+      position: relative;
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      background: var(--accent-3);
+      border-radius: 50%;
+    }
+
+    .pulse-indicator::before {
+      content: '';
+      position: absolute;
+      top: -4px;
+      left: -4px;
+      right: -4px;
+      bottom: -4px;
+      background: rgba(16, 185, 129, 0.3);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    /* ===== STATS GRID WITH ANIMATION ===== */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    .stat-mini {
+      background: linear-gradient(135deg, rgba(224, 231, 255, 0.8), rgba(248, 250, 252, 0.8));
+      padding: 16px;
+      border-radius: 10px;
+      text-align: center;
+      border: 1px solid var(--border-light);
+      animation: fadeInScale 0.6s ease;
+    }
+
+    .stat-mini:nth-child(1) { animation-delay: 0.1s; }
+    .stat-mini:nth-child(2) { animation-delay: 0.2s; }
+    .stat-mini:nth-child(3) { animation-delay: 0.3s; }
+    .stat-mini:nth-child(4) { animation-delay: 0.4s; }
+
+    .stat-mini-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .stat-mini-value {
+      font-size: 1.8rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--primary-bright), var(--accent-1));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ===== ANIMATED BORDER ===== */
+    .animated-border {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .animated-border::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      animation: slideInRight 2s infinite;
+      pointer-events: none;
+    }
+
+    /* ===== INFO PANEL ===== */
+    .info-panel {
+      background: linear-gradient(135deg, rgba(224, 231, 255, 0.8), rgba(252, 231, 243, 0.8));
+      border-left: 4px solid var(--primary-bright);
+      border-radius: 8px;
+      padding: 16px;
+      margin: 12px 0;
+      animation: slideInLeft 0.6s ease;
+    }
+
+    .info-panel.warning {
+      border-left-color: var(--accent-2);
+      background: linear-gradient(135deg, rgba(254, 243, 199, 0.5), rgba(255, 250, 235, 0.5));
+    }
+
+    .info-panel.success {
+      border-left-color: var(--accent-3);
+      background: linear-gradient(135deg, rgba(220, 252, 231, 0.5), rgba(240, 253, 244, 0.5));
+    }
   </style>
   </style>
 </head>
@@ -745,33 +1103,92 @@
   <main>
     <!-- ===== OVERVIEW SECTION ===== -->
     <section class="section active" id="overview">
-      <h1 style="margin-bottom: 32px; font-size: 2rem;">Infrastructure Dashboard</h1>
+      <h1 style="margin-bottom: 32px; font-size: 2.5rem; animation: slideInLeft 0.8s ease;">
+        <i class="fas fa-layer-group" style="margin-right: 12px;"></i>Infrastructure Dashboard
+      </h1>
 
       <div class="grid grid-3">
-        <div class="card stat-card">
-          <div class="card-icon" style="width: auto; height: auto; margin: 0 auto 16px; font-size: 2.5rem;">
+        <div class="card stat-card stat-counter">
+          <div class="card-icon" style="width: auto; height: auto; margin: 0 auto 16px; font-size: 3rem;">
             <i class="fas fa-cube"></i>
           </div>
-          <div class="stat-value">7</div>
+          <div class="stat-value stat-value-animated" id="resourceCount">0</div>
           <div class="stat-label">Terraform Resources</div>
         </div>
-        <div class="card stat-card">
-          <div class="card-icon" style="width: auto; height: auto; margin: 0 auto 16px; font-size: 2.5rem; color: #0066cc;">
+        <div class="card stat-card stat-counter">
+          <div class="card-icon" style="width: auto; height: auto; margin: 0 auto 16px; font-size: 3rem; color: #0066cc;">
             <i class="fab fa-github"></i>
           </div>
-          <div class="stat-value">2</div>
+          <div class="stat-value stat-value-animated" id="workflowCount">0</div>
           <div class="stat-label">Active Workflows</div>
         </div>
-        <div class="card stat-card">
-          <div class="card-icon" style="width: auto; height: auto; margin: 0 auto 16px; font-size: 2.5rem; color: #0066cc;">
+        <div class="card stat-card stat-counter">
+          <div class="card-icon" style="width: auto; height: auto; margin: 0 auto 16px; font-size: 3rem; color: #0066cc;">
             <i class="fas fa-cloud"></i>
           </div>
-          <div class="stat-value">1</div>
+          <div class="stat-value stat-value-animated" id="rgCount">0</div>
           <div class="stat-label">Resource Groups</div>
         </div>
       </div>
 
-      <div class="grid grid-2">
+      <!-- AZURE ARCHITECTURE VISUALIZATION -->
+      <div class="card" style="margin-top: 32px;">
+        <div class="card-header">
+          <div class="card-title">
+            <div class="card-icon" style="background: linear-gradient(135deg, rgba(0, 102, 204, 0.15), rgba(59, 130, 246, 0.15)); color: #0284c7;"><i class="fas fa-sitemap"></i></div>
+            Azure Infrastructure Architecture
+          </div>
+        </div>
+        <div class="architecture-container">
+          <div class="architecture-grid">
+            <div class="resource-box">
+              <div class="resource-box-icon">📦</div>
+              <div class="resource-box-name">Resource Group</div>
+              <div class="resource-box-type">Container</div>
+            </div>
+            <div class="resource-box">
+              <div class="resource-box-icon">🌐</div>
+              <div class="resource-box-name">VNet</div>
+              <div class="resource-box-type">Network</div>
+            </div>
+            <div class="resource-box">
+              <div class="resource-box-icon">📡</div>
+              <div class="resource-box-name">Subnet</div>
+              <div class="resource-box-type">Network</div>
+            </div>
+            <div class="resource-box">
+              <div class="resource-box-icon">🛡️</div>
+              <div class="resource-box-name">NSG</div>
+              <div class="resource-box-type">Security</div>
+            </div>
+            <div class="resource-box">
+              <div class="resource-box-icon">🌍</div>
+              <div class="resource-box-name">Public IP</div>
+              <div class="resource-box-type">Network</div>
+            </div>
+            <div class="resource-box">
+              <div class="resource-box-icon">🔌</div>
+              <div class="resource-box-name">NIC</div>
+              <div class="resource-box-type">Network</div>
+            </div>
+            <div class="resource-box">
+              <div class="resource-box-icon">💻</div>
+              <div class="resource-box-name">Linux VM</div>
+              <div class="resource-box-type">Compute</div>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top: 20px; padding: 16px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(16, 185, 129, 0.02)); border-left: 4px solid var(--accent-3); border-radius: 8px;">
+          <div style="font-size: 0.9rem; color: var(--text-dark); margin-bottom: 8px;">
+            <strong>Architecture Flow:</strong>
+          </div>
+          <div style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.6;">
+            All resources are deployed within a single Resource Group in Central India region. The Virtual Network provides network isolation with subnets. Network Security Group controls traffic via HTTP (80) and SSH (22) rules. The Linux VM is connected via NIC and Public IP for external access, running NGINX web server with your custom web application.
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-2" style="margin-top: 32px;">
         <div class="card">
           <div class="card-header">
             <div class="card-title">
@@ -780,21 +1197,45 @@
             </div>
             <div class="card-badge">Active</div>
           </div>
-          <div class="metric">
-            <span class="metric-label">Subscription</span>
-            <span class="metric-value" style="font-size: 0.9rem;">f805bc8d-1c98-4d3b-85d2-f2adea26cb5b</span>
+          <div class="stats-row">
+            <div class="stat-mini">
+              <div class="stat-mini-label">Subscription</div>
+              <div style="font-size: 0.75rem; color: var(--primary-bright); font-weight: 700; font-family: 'Fira Code';">f805bc8d...</div>
+            </div>
+            <div class="stat-mini">
+              <div class="stat-mini-label">Region</div>
+              <div class="stat-mini-value" style="font-size: 1.1rem;">Central India</div>
+            </div>
+            <div class="stat-mini">
+              <div class="stat-mini-label">Backend</div>
+              <div class="stat-mini-value" style="font-size: 1rem;">azurerm</div>
+            </div>
           </div>
-          <div class="metric">
-            <span class="metric-label">Region</span>
-            <span class="metric-value" style="font-size: 1.2rem;">Central India</span>
+
+          <div class="feature-box">
+            <div class="feature-box-icon"><i class="fas fa-server"></i></div>
+            <div class="feature-box-content">
+              <div class="feature-box-title">Environment</div>
+              <div class="feature-box-desc">demo</div>
+            </div>
           </div>
-          <div class="metric">
-            <span class="metric-label">Backend State</span>
-            <span class="metric-value" style="font-size: 0.9rem;">azurerm</span>
+
+          <div class="feature-box" style="animation-delay: 0.1s;">
+            <div class="feature-box-icon"><i class="fas fa-cloud"></i></div>
+            <div class="feature-box-content">
+              <div class="feature-box-title">Resource Group</div>
+              <div class="feature-box-desc">demo-nginx-rg</div>
+            </div>
           </div>
-          <div class="metric">
-            <span class="metric-label">Environment</span>
-            <span class="metric-value" style="font-size: 1.2rem;">demo</span>
+
+          <div class="feature-box" style="animation-delay: 0.2s;">
+            <div class="feature-box-icon"><i class="fas fa-shield-alt"></i></div>
+            <div class="feature-box-content">
+              <div class="feature-box-title">VM Status</div>
+              <div class="feature-box-desc">
+                <span class="pulse-indicator"></span> Running & Healthy
+              </div>
+            </div>
           </div>
         </div>
 
@@ -805,39 +1246,38 @@
               Terraform Overview
             </div>
           </div>
-          <div class="badge-group">
-            <div class="badge">v1.9.8</div>
-            <div class="badge">Provider: azurerm v4.57.0</div>
-            <div class="badge">State: Remote</div>
-            <div class="badge azure">Azure Storage Backend</div>
+          <div class="connection-map">
+            <div class="connection-node node-1" title="Provider">
+              <i class="fas fa-plug"></i>
+            </div>
+            <div class="connection-node node-2" title="Variables">
+              <i class="fas fa-sliders-h"></i>
+            </div>
+            <div class="connection-node node-3" title="Resources">
+              <i class="fas fa-cube"></i>
+            </div>
+            <div class="connection-node node-4" title="Outputs">
+              <i class="fas fa-output"></i>
+            </div>
+            <div class="connection-node node-5" title="State">
+              <i class="fas fa-database"></i>
+            </div>
           </div>
-          <div style="margin-top: 20px; padding: 16px; background: var(--bg-card); border-radius: 8px;">
-            <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 8px;">Last Updated</div>
-            <div style="font-weight: 600; font-family: 'Fira Code', monospace;" id="lastUpdated">Just now</div>
+
+          <div class="badge-group" style="margin-top: 20px;">
+            <div class="badge">v1.9.8</div>
+            <div class="badge">azurerm v4.57.0</div>
+            <div class="badge">Remote State</div>
+            <div class="badge azure">Azure Storage</div>
+            <div class="badge github">OIDC Auth</div>
           </div>
         </div>
       </div>
 
-      <div class="card" style="margin-top: 24px;">
-        <div class="card-header">
-          <div class="card-title">
-            <div class="card-icon"><i class="fas fa-chart-line"></i></div>
-            Quick Status
-          </div>
-        </div>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
-          <div style="padding: 16px; background: var(--bg-card); border-radius: 8px; border-left: 4px solid var(--success);">
-            <div style="color: var(--text-muted); font-size: 0.85rem;">Terraform State</div>
-            <div style="color: var(--success); font-weight: 700; margin-top: 8px;">✓ Synced</div>
-          </div>
-          <div style="padding: 16px; background: var(--bg-card); border-radius: 8px; border-left: 4px solid var(--primary);">
-            <div style="color: var(--text-muted); font-size: 0.85rem;">CI/CD Pipeline</div>
-            <div style="color: var(--primary); font-weight: 700; margin-top: 8px;">Configured</div>
-          </div>
-          <div style="padding: 16px; background: var(--bg-card); border-radius: 8px; border-left: 4px solid #0066cc;">
-            <div style="color: var(--text-muted); font-size: 0.85rem;">Azure Resources</div>
-            <div style="color: #0066cc; font-weight: 700; margin-top: 8px;">7 Deployed</div>
-          </div>
+      <div class="info-panel success" style="margin-top: 24px;">
+        <strong style="color: var(--text-dark);">✓ System Status: All Systems Operational</strong>
+        <div style="font-size: 0.85rem; color: var(--text-primary); margin-top: 4px;">
+          Terraform state is synced, CI/CD pipeline is configured, and 7 Azure resources are deployed and healthy.
         </div>
       </div>
     </section>
@@ -1313,9 +1753,9 @@
     const variablesContainer = document.getElementById('terraformVariables');
     data.terraform.variables.forEach(variable => {
       const html = `
-        <div style="padding: 12px; background: var(--bg-card); border-radius: 6px; margin-bottom: 10px; font-family: 'Fira Code', monospace; font-size: 0.85rem;">
+        <div style="padding: 12px; background: linear-gradient(135deg, rgba(224, 231, 255, 0.5), rgba(252, 231, 243, 0.3)); border-radius: 8px; margin-bottom: 10px; font-family: 'Fira Code', monospace; font-size: 0.85rem; border: 1px solid var(--border-light);">
           <div style="color: var(--text-muted); margin-bottom: 4px;">${variable.name}</div>
-          <div style="color: var(--primary); font-weight: 600;">${variable.value}</div>
+          <div style="color: var(--primary-bright); font-weight: 700;">${variable.value}</div>
           <div style="color: var(--text-muted); font-size: 0.75rem; margin-top: 4px;">Type: ${variable.type}</div>
         </div>
       `;
@@ -1361,18 +1801,46 @@
 
       // Update timestamp
       const now = new Date();
-      document.getElementById('lastUpdated').textContent = now.toLocaleTimeString();
+      if (document.getElementById('lastUpdated')) {
+        document.getElementById('lastUpdated').textContent = now.toLocaleTimeString();
+      }
 
       console.log('Dashboard refreshed at', now.toLocaleString());
     }
 
     // Auto-refresh every 30 seconds
     setInterval(() => {
-      document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString();
+      if (document.getElementById('lastUpdated')) {
+        document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString();
+      }
     }, 30000);
 
+    // Animated counter function
+    function animateCounter(element, target, duration = 1500) {
+      let current = 0;
+      const increment = target / (duration / 16);
+      const timer = setInterval(() => {
+        current += increment;
+        if (current >= target) {
+          element.textContent = target;
+          clearInterval(timer);
+        } else {
+          element.textContent = Math.floor(current);
+        }
+      }, 16);
+    }
+
+    // Initialize counters when page loads
+    window.addEventListener('load', () => {
+      animateCounter(document.getElementById('resourceCount'), 7);
+      animateCounter(document.getElementById('workflowCount'), 2);
+      animateCounter(document.getElementById('rgCount'), 1);
+    });
+
     // Initialize
-    document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString();
+    if (document.getElementById('lastUpdated')) {
+      document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString();
+    }
   </script>
 </body>
 </html>
