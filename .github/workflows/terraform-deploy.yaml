@@ -55,7 +55,7 @@ jobs:
     environment: security-check
     steps:
     - name: Security Check
-      uses: |
+      run: |
         echo "Waiting for manual approval before applying Terraform changes..."
 
   terraform-apply:
