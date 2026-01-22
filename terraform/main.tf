@@ -114,10 +114,21 @@ resource "azurerm_linux_virtual_machine" "vm" {
   custom_data = base64encode(<<EOF
 #!/bin/bash
 apt-get update -y
-apt-get install -y nginx
-echo "<h2>Hello Human!, I'm from Azure VM using NGINX</h2>" > /var/www/html/index.html
-echo "<h2>Was built with Terraform and deployed using GitHub Actions Workflow</h2>" >> /var/www/html/index.html
-echo "<h3>- Have a great day and see you again!</h3>" >> /var/www/html/index.html
+apt-get install -y nginx curl
+
+# Create web app directory
+mkdir -p /var/www/html
+
+# Deploy the web application
+cat > /var/www/html/index.html <<'WEBEOF'
+${file("${path.module}/web-app/index.html")}
+WEBEOF
+
+# Set proper permissions
+chown -R www-data:www-data /var/www/html
+chmod -R 755 /var/www/html
+
+# Enable and restart NGINX
 systemctl enable nginx
 systemctl restart nginx
 EOF
