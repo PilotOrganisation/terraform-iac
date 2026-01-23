@@ -75,7 +75,7 @@
         }
 
         .card {
-            background: white;
+            background: rgb(255, 255, 255);
             border-radius: 12px;
             padding: 30px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
@@ -561,37 +561,7 @@
         </div>
 
         <div class="info-section">
-            <h3>🎯 Features</h3>
-            <div class="info-grid">
-                <div class="info-item">
-                    <strong>✓</strong>
-                    <span>Automated Infrastructure Provisioning</span>
-                </div>
-                <div class="info-item">
-                    <strong>✓</strong>
-                    <span>Network Security Groups (NSG)</span>
-                </div>
-                <div class="info-item">
-                    <strong>✓</strong>
-                    <span>Public IP for External Access</span>
-                </div>
-                <div class="info-item">
-                    <strong>✓</strong>
-                    <span>CI/CD with GitHub Actions</span>
-                </div>
-                <div class="info-item">
-                    <strong>✓</strong>
-                    <span>Terraform State Management</span>
-                </div>
-                <div class="info-item">
-                    <strong>✓</strong>
-                    <span>Infrastructure as Code Best Practices</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="info-section">
-            <h3>🏗️ Azure Resources Created</h3>
+            <h3>️ Azure Resources Created</h3>
             <div class="resources-grid">
                 <div class="resource-item">
                     <div class="resource-header">
@@ -773,18 +743,19 @@
         }
 
         // Update pipeline status
+        let currentStageIndex = 0;
+        
         function updatePipelineStatus() {
+            const stages = document.querySelectorAll('.pipeline-stage');
+
             setInterval(() => {
-                const stages = document.querySelectorAll('.pipeline-stage');
-                const randomStageIndex = Math.floor(Math.random() * stages.length);
-                
-                // Cycle through stages randomly for demo purposes
+                // Reset all stages
                 stages.forEach((stage, index) => {
                     const status = stage.querySelector('.stage-status');
-                    if (index <= randomStageIndex) {
+                    if (index < currentStageIndex) {
                         status.className = 'stage-status completed';
                         status.textContent = 'Completed';
-                    } else if (index === randomStageIndex + 1) {
+                    } else if (index === currentStageIndex) {
                         status.className = 'stage-status running';
                         status.textContent = 'Running';
                     } else {
@@ -792,7 +763,15 @@
                         status.textContent = 'Pending';
                     }
                 });
-            }, 5000);
+
+                // Move to next stage
+                currentStageIndex++;
+
+                // Loop back to beginning when all stages are complete
+                if (currentStageIndex >= stages.length) {
+                    currentStageIndex = 0;
+                }
+            }, 1000);
         }
 
         // Calculate and display uptime
