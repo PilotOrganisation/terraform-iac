@@ -1,4 +1,4 @@
-name: "Workflow to destroy Azure infra using Terraform"
+name: "DESTROY: Azure infra using Terraform"
 
 on:
   workflow_dispatch:

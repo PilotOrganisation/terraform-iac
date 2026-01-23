@@ -1,4 +1,4 @@
-name: "Workflow to deploy Azure infra using Terraform"
+name: "DEPLOY: Azure infra using Terraform"
 
 on:
   workflow_dispatch:

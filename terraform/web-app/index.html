@@ -1,2144 +1,875 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>IaC Command Center — Terraform · GitHub · Azure</title>
-
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-  <style>
-    :root {
-      --glass-light: rgba(255, 255, 255, 0.7);
-      --glass-dark: rgba(15, 23, 42, 0.05);
-      --glass-border: rgba(255, 255, 255, 0.2);
-      --blue-light: #e0f2fe;
-      --blue-medium: #0ea5e9;
-      --blue-dark: #0369a1;
-      --cyan-light: #cffafe;
-      --cyan-medium: #06b6d4;
-      --cyan-dark: #0891b2;
-      --slate-light: #f1f5f9;
-      --slate-medium: #cbd5e1;
-      --slate-dark: #1e293b;
-      --accent-blue: #38bdf8;
-      --accent-cyan: #22d3ee;
-      --accent-teal: #14b8a6;
-      --text-dark: #0f172a;
-      --text-gray: #475569;
-      --text-light: #94a3b8;
-      --bg-white: #ffffff;
-      --bg-blur: rgba(241, 245, 249, 0.8);
-      --bg-blur-dark: rgba(30, 41, 59, 0.05);
-      --border-glass: rgba(148, 163, 184, 0.15);
-      --shadow: 0 8px 32px rgba(15, 23, 42, 0.1);
-      --shadow-lg: 0 20px 48px rgba(15, 23, 42, 0.15);
-      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    html, body {
-      height: 100%;
-      background: linear-gradient(135deg, #f0f9ff 0%, #f0fdf4 50%, #ecfdf5 100%);
-      color: var(--text-dark);
-      font-family: 'Space Grotesk', system-ui, -apple-system, sans-serif;
-      overflow-x: hidden;
-    }
-
-    .app {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* ===== ANIMATED BACKGROUND ===== */
-    .animated-bg {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      z-index: -1;
-      overflow: hidden;
-    }
-
-    .gradient-orb {
-      position: absolute;
-      border-radius: 50%;
-      opacity: 0.3;
-      filter: blur(80px);
-      animation: float 15s ease-in-out infinite;
-    }
-
-    .orb-1 {
-      width: 400px;
-      height: 400px;
-      background: linear-gradient(135deg, var(--blue-medium), var(--cyan-medium));
-      top: -100px;
-      left: -100px;
-      animation-delay: 0s;
-    }
-
-    .orb-2 {
-      width: 300px;
-      height: 300px;
-      background: linear-gradient(135deg, var(--cyan-medium), var(--accent-cyan));
-      bottom: 100px;
-      right: 50px;
-      animation-delay: 5s;
-    }
-
-    .orb-3 {
-      width: 350px;
-      height: 350px;
-      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-teal));
-      top: 50%;
-      right: -100px;
-      animation-delay: 10s;
-    }
-
-    @keyframes float {
-      0%, 100% { transform: translate(0, 0); }
-      25% { transform: translate(20px, -30px); }
-      50% { transform: translate(-20px, 20px); }
-      75% { transform: translate(30px, 10px); }
-    }
-
-    /* ===== HEADER ===== */
-    header {
-      background: var(--glass-light);
-      backdrop-filter: blur(20px) saturate(1.8);
-      border-bottom: 1px solid var(--border-glass);
-      padding: 20px 40px;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      box-shadow: var(--shadow);
-    }
-
-    .header-content {
-      max-width: 1800px;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 30px;
-    }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      font-size: 1.6rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: var(--transition);
-    }
-
-    .logo:hover {
-      transform: scale(1.05);
-    }
-
-    .logo-icon {
-      width: 48px;
-      height: 48px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, var(--blue-medium), var(--cyan-medium));
-      border-radius: 12px;
-      color: white;
-      font-size: 1.5rem;
-    }
-
-    .logo-text {
-      background: linear-gradient(135deg, var(--blue-dark), var(--cyan-dark));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .header-actions {
-      display: flex;
-      gap: 16px;
-      align-items: center;
-    }
-
-    .status-badge {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 16px;
-      background: rgba(20, 184, 166, 0.15);
-      border-radius: 20px;
-      border: 1px solid var(--accent-teal);
-      font-weight: 600;
-      font-size: 0.9rem;
-      color: var(--accent-teal);
-      animation: pulse 2s infinite;
-    }
-
-    .status-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: var(--green-medium);
-      animation: blink 1.5s infinite;
-    }
-
-    @keyframes blink {
-      0%, 49%, 100% { opacity: 1; }
-      50%, 99% { opacity: 0.3; }
-    }
-
-    @keyframes pulse {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
-      50% { box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
-    }
-
-    .btn {
-      padding: 11px 20px;
-      border: none;
-      border-radius: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: var(--transition);
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.9rem;
-      font-family: 'Space Grotesk', sans-serif;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--blue-medium), var(--cyan-medium));
-      color: white;
-      box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 20px rgba(6, 182, 212, 0.4);
-    }
-
-    .btn-secondary {
-      background: var(--bg-lighter);
-      color: var(--text-dark);
-      border: 2px solid var(--border-light);
-    }
-
-    .btn-secondary:hover {
-      background: white;
-      border-color: var(--blue-medium);
-    }
-
-    /* ===== SIDEBAR ===== */
-    .sidebar {
-      position: fixed;
-      left: 0;
-      top: 90px;
-      width: 280px;
-      height: calc(100vh - 90px);
-      background: var(--glass-light);
-      border-right: 1px solid var(--border-glass);
-      padding: 30px 20px;
-      overflow-y: auto;
-      z-index: 50;
-      backdrop-filter: blur(15px) saturate(1.8);
-    }
-
-    .sidebar-title {
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: var(--text-light);
-      text-transform: uppercase;
-      letter-spacing: 1.2px;
-      margin-bottom: 16px;
-      padding: 0 8px;
-    }
-
-    .nav-menu {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .nav-item {
-      padding: 14px 16px;
-      background: transparent;
-      border: none;
-      color: var(--text-gray);
-      text-align: left;
-      cursor: pointer;
-      border-radius: 12px;
-      transition: var(--transition);
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-size: 0.95rem;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .nav-item::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 0;
-      height: 100%;
-      width: 4px;
-      background: linear-gradient(180deg, var(--blue-medium), var(--cyan-medium));
-      transform: scaleY(0);
-      transform-origin: top;
-      transition: transform 0.4s ease;
-    }
-
-    .nav-item:hover {
-      background: rgba(6, 182, 212, 0.1);
-      color: var(--text-dark);
-    }
-
-    .nav-item.active {
-      background: rgba(6, 182, 212, 0.15);
-      color: var(--cyan-dark);
-      box-shadow: inset 0 0 0 1px rgba(6, 182, 212, 0.3);
-    }
-
-    .nav-item.active::before {
-      transform: scaleY(1);
-    }
-
-    .nav-item i {
-      font-size: 1.1rem;
-      min-width: 24px;
-    }
-
-    /* ===== MAIN ===== */
-    main {
-      margin-left: 280px;
-      flex: 1;
-      max-width: calc(100% - 280px);
-      padding: 40px;
-    }
-
-    .section {
-      display: none;
-      animation: fadeInUp 0.6s ease forwards;
-    }
-
-    .section.active {
-      display: block;
-    }
-
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .page-header {
-      margin-bottom: 40px;
-    }
-
-    .page-title {
-      font-size: 2.5rem;
-      font-weight: 700;
-      margin-bottom: 8px;
-      background: linear-gradient(135deg, var(--blue-dark), var(--cyan-dark));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .page-subtitle {
-      font-size: 1rem;
-      color: var(--text-light);
-      font-weight: 400;
-    }
-
-    /* ===== GRID ===== */
-    .grid {
-      display: grid;
-      gap: 24px;
-      margin-bottom: 32px;
-    }
-
-    .grid-2 {
-      grid-template-columns: repeat(2, 1fr);
-    }
-
-    .grid-3 {
-      grid-template-columns: repeat(3, 1fr);
-    }
-
-    .grid-4 {
-      grid-template-columns: repeat(4, 1fr);
-    }
-
-    @media (max-width: 1400px) {
-      .grid-4 { grid-template-columns: repeat(2, 1fr); }
-    }
-
-    @media (max-width: 768px) {
-      .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
-      main { margin-left: 0; max-width: 100%; padding: 20px; }
-      .sidebar { display: none; }
-    }
-
-    /* ===== CARD ===== */
-    .card {
-      background: var(--glass-light);
-      border-radius: 16px;
-      padding: 28px;
-      border: 1px solid var(--border-glass);
-      transition: var(--transition);
-      position: relative;
-      overflow: hidden;
-      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
-      backdrop-filter: blur(10px) saturate(1.5);
-    }
-
-    .card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, var(--blue-medium), var(--cyan-medium), var(--accent-cyan), var(--accent-teal));
-      opacity: 0;
-      transition: opacity 0.4s ease;
-    }
-
-    .card:hover {
-      border-color: rgba(6, 182, 212, 0.3);
-      box-shadow: var(--shadow);
-      transform: translateY(-4px);
-    }
-
-    .card:hover::before {
-      opacity: 1;
-    }
-
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 24px;
-      gap: 16px;
-    }
-
-    .card-title-section {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      flex: 1;
-    }
-
-    .card-icon {
-      width: 52px;
-      height: 52px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(20, 184, 166, 0.2));
-      border-radius: 14px;
-      color: var(--cyan-medium);
-      font-size: 1.5rem;
-      flex-shrink: 0;
-    }
-
-    .card-title {
-      font-size: 1.2rem;
-      font-weight: 700;
-      color: var(--text-dark);
-    }
-
-    .card-subtitle {
-      font-size: 0.85rem;
-      color: var(--text-light);
-      margin-top: 4px;
-    }
-
-    .card-badge {
-      padding: 8px 14px;
-      background: rgba(20, 184, 166, 0.15);
-      color: var(--accent-teal);
-      border-radius: 20px;
-      font-size: 0.8rem;
-      font-weight: 700;
-      border: 1px solid rgba(20, 184, 166, 0.4);
-      white-space: nowrap;
-    }
-
-    .card-badge.warning {
-      background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(245, 158, 11, 0.06));
-      color: #b45309;
-      border-color: #fbbf24;
-    }
-
-    .card-badge.danger {
-      background: linear-gradient(135deg, rgba(239, 68, 68, 0.12), rgba(239, 68, 68, 0.06));
-      color: #991b1b;
-      border-color: #fca5a5;
-    }
-
-    /* ===== STAT BOX ===== */
-    .stat-box {
-      background: var(--glass-light);
-      padding: 24px;
-      border-radius: 14px;
-      border: 1px solid var(--border-glass);
-      text-align: center;
-      transition: var(--transition);
-      backdrop-filter: blur(10px) saturate(1.5);
-    }
-
-    .stat-box:hover {
-      transform: translateY(-6px);
-      border-color: rgba(6, 182, 212, 0.3);
-      box-shadow: 0 12px 24px rgba(6, 182, 212, 0.1);
-    }
-
-    .stat-number {
-      font-size: 2.8rem;
-      font-weight: 700;
-      background: linear-gradient(135deg, var(--blue-medium), var(--cyan-medium));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin-bottom: 8px;
-      font-family: 'Space Mono', monospace;
-    }
-
-    .stat-label {
-      font-size: 0.95rem;
-      color: var(--text-gray);
-      font-weight: 600;
-    }
-
-    .stat-unit {
-      font-size: 0.8rem;
-      color: var(--text-light);
-      margin-top: 4px;
-    }
-
-    /* ===== METRIC ===== */
-    .metric {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 14px;
-      background: rgba(6, 182, 212, 0.08);
-      border-radius: 10px;
-      margin-bottom: 12px;
-      border: 1px solid var(--border-glass);
-      transition: var(--transition);
-    }
-
-    .metric:hover {
-      background: rgba(6, 182, 212, 0.12);
-    }
-
-    .metric-label {
-      font-size: 0.9rem;
-      color: var(--text-gray);
-      font-weight: 600;
-    }
-
-    .metric-value {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: var(--cyan-dark);
-      font-family: 'Space Mono', monospace;
-    }
-
-    /* ===== RESOURCE ITEM ===== */
-    .resource-item {
-      display: flex;
-      align-items: center;
-      padding: 16px;
-      background: var(--glass-light);
-      border: 1px solid var(--border-glass);
-      border-radius: 12px;
-      margin-bottom: 12px;
-      transition: var(--transition);
-      cursor: pointer;
-      position: relative;
-      overflow: hidden;
-      backdrop-filter: blur(8px) saturate(1.5);
-    }
-
-    .resource-item::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 0;
-      height: 100%;
-      width: 3px;
-      background: linear-gradient(180deg, var(--blue-medium), var(--cyan-medium));
-      transform: scaleX(0);
-      transform-origin: left;
-      transition: transform 0.4s ease;
-    }
-
-    .resource-item:hover {
-      background: var(--glass-light);
-      border-color: rgba(6, 182, 212, 0.3);
-      box-shadow: 0 4px 12px rgba(6, 182, 212, 0.1);
-      transform: translateX(4px);
-    }
-
-    .resource-item:hover::before {
-      transform: scaleX(1);
-    }
-
-    .resource-icon {
-      width: 40px;
-      height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(20, 184, 166, 0.2));
-      border-radius: 10px;
-      color: var(--cyan-medium);
-      margin-right: 12px;
-      font-size: 1.1rem;
-      flex-shrink: 0;
-    }
-
-    .resource-info {
-      flex: 1;
-    }
-
-    .resource-name {
-      font-weight: 700;
-      font-size: 0.95rem;
-      color: var(--text-dark);
-      margin-bottom: 4px;
-      font-family: 'Space Mono', monospace;
-    }
-
-    .resource-details {
-      font-size: 0.85rem;
-      color: var(--text-light);
-    }
-
-    .resource-badge {
-      padding: 6px 12px;
-      background: rgba(20, 184, 166, 0.15);
-      color: var(--accent-teal);
-      border-radius: 8px;
-      font-size: 0.75rem;
-      font-weight: 700;
-      border: 1px solid rgba(20, 184, 166, 0.4);
-    }
-
-    /* ===== CODE BLOCK ===== */
-    .code-block {
-      background: var(--glass-light);
-      border: 1px solid var(--border-glass);
-      border-radius: 12px;
-      padding: 18px;
-      overflow-x: auto;
-      margin: 16px 0;
-      position: relative;
-      backdrop-filter: blur(10px) saturate(1.5);
-    }
-
-    .code-block::before {
-      content: 'CODE';
-      position: absolute;
-      top: 8px;
-      right: 12px;
-      font-size: 0.7rem;
-      font-weight: 700;
-      color: var(--text-light);
-      letter-spacing: 1px;
-    }
-
-    .code-block pre {
-      font-family: 'Space Mono', monospace;
-      font-size: 0.85rem;
-      line-height: 1.6;
-      color: var(--text-dark);
-    }
-
-    .code-label {
-      font-size: 0.75rem;
-      color: var(--text-light);
-      margin-bottom: 12px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      font-weight: 700;
-    }
-
-    /* ===== WORKFLOW STEP ===== */
-    .workflow-step {
-      display: flex;
-      align-items: center;
-      padding: 18px;
-      background: var(--glass-light);
-      border-left: 4px solid var(--cyan-medium);
-      border-radius: 10px;
-      margin-bottom: 12px;
-      transition: var(--transition);
-      position: relative;
-      backdrop-filter: blur(8px) saturate(1.5);
-    }
-
-    .workflow-step.success {
-      border-left-color: var(--accent-teal);
-      background: var(--glass-light);
-    }
-
-    .workflow-step.warning {
-      border-left-color: #fbbf24;
-      background: var(--glass-light);
-    }
-
-    .workflow-step.danger {
-      border-left-color: #fca5a5;
-      background: var(--glass-light);
-    }
-
-    .workflow-step:hover {
-      transform: translateX(6px);
-      box-shadow: 0 4px 12px rgba(168, 85, 247, 0.1);
-    }
-
-    .workflow-step-icon {
-      width: 44px;
-      height: 44px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(20, 184, 166, 0.2));
-      border-radius: 50%;
-      color: var(--cyan-medium);
-      margin-right: 16px;
-      font-size: 1.1rem;
-      flex-shrink: 0;
-      font-weight: 700;
-    }
-
-    .workflow-step.success .workflow-step-icon {
-      background: linear-gradient(135deg, rgba(20, 184, 166, 0.2), rgba(20, 184, 166, 0.15));
-      color: var(--accent-teal);
-    }
-
-    .workflow-step.warning .workflow-step-icon {
-      background: linear-gradient(135deg, rgba(254, 252, 232, 0.7), rgba(254, 243, 199, 0.7));
-      color: #f59e0b;
-    }
-
-    .workflow-step-info {
-      flex: 1;
-    }
-
-    .workflow-step-title {
-      font-weight: 700;
-      font-size: 0.95rem;
-      color: var(--text-dark);
-      margin-bottom: 4px;
-    }
-
-    .workflow-step-desc {
-      font-size: 0.85rem;
-      color: var(--text-gray);
-    }
-
-    /* ===== ARCHITECTURE GRID ===== */
-    .architecture-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 16px;
-      margin: 24px 0;
-    }
-
-    .arch-box {
-      background: var(--glass-light);
-      border: 1px solid var(--border-glass);
-      border-radius: 12px;
-      padding: 20px;
-      text-align: center;
-      cursor: pointer;
-      transition: var(--transition);
-      position: relative;
-      overflow: hidden;
-      backdrop-filter: blur(10px) saturate(1.5);
-    }
-
-    .arch-box::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(135deg, rgba(6, 182, 212, 0.08), transparent);
-      opacity: 0;
-      transition: opacity 0.4s ease;
-    }
-
-    .arch-box:hover {
-      border-color: rgba(6, 182, 212, 0.3);
-      transform: translateY(-8px);
-      box-shadow: 0 12px 24px rgba(6, 182, 212, 0.1);
-    }
-
-    .arch-box:hover::before {
-      opacity: 1;
-    }
-
-    .arch-icon {
-      font-size: 2.2rem;
-      margin-bottom: 12px;
-    }
-
-    .arch-name {
-      font-weight: 700;
-      font-size: 0.9rem;
-      color: var(--text-dark);
-      margin-bottom: 4px;
-    }
-
-    .arch-type {
-      font-size: 0.75rem;
-      color: var(--text-light);
-      background: rgba(6, 182, 212, 0.15);
-      padding: 4px 8px;
-      border-radius: 6px;
-      display: inline-block;
-    }
-
-    /* ===== BADGE PILLS ===== */
-    .badge-group {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin: 16px 0;
-    }
-
-    .badge {
-      padding: 8px 14px;
-      background: rgba(6, 182, 212, 0.15);
-      color: var(--cyan-dark);
-      border-radius: 20px;
-      font-size: 0.8rem;
-      font-weight: 700;
-      border: 1px solid var(--cyan-medium);
-      transition: var(--transition);
-      cursor: pointer;
-    }
-
-    .badge:hover {
-      background: rgba(6, 182, 212, 0.25);
-      transform: scale(1.05);
-    }
-
-    .badge.azure {
-      background: rgba(6, 182, 212, 0.15);
-      color: var(--cyan-dark);
-      border-color: var(--cyan-medium);
-    }
-
-    .badge.github {
-      background: rgba(20, 184, 166, 0.15);
-      color: var(--accent-teal);
-      border-color: var(--accent-teal);
-    }
-
-    .badge.terraform {
-      background: rgba(20, 184, 166, 0.15);
-      color: var(--accent-teal);
-      border-color: var(--accent-teal);
-    }
-
-    /* ===== INFO PANEL ===== */
-    .info-panel {
-      background: var(--glass-light);
-      border-left: 4px solid var(--accent-teal);
-      border-radius: 10px;
-      padding: 16px;
-      margin: 16px 0;
-      transition: var(--transition);
-      backdrop-filter: blur(8px) saturate(1.5);
-    }
-
-    .info-panel.warning {
-      background: var(--glass-light);
-      border-left-color: #f59e0b;
-    }
-
-    .info-panel.danger {
-      background: var(--glass-light);
-      border-left-color: #ef4444;
-    }
-
-    .info-panel:hover {
-      transform: translateX(4px);
-    }
-
-    .info-title {
-      font-weight: 700;
-      color: var(--text-dark);
-      margin-bottom: 4px;
-    }
-
-    .info-text {
-      font-size: 0.9rem;
-      color: var(--text-gray);
-      line-height: 1.5;
-    }
-
-    /* ===== TABS ===== */
-    .tabs {
-      display: flex;
-      gap: 8px;
-      border-bottom: 2px solid var(--border-glass);
-      margin-bottom: 24px;
-      overflow-x: auto;
-    }
-
-    .tab {
-      padding: 12px 18px;
-      background: none;
-      border: none;
-      color: var(--text-gray);
-      cursor: pointer;
-      font-weight: 700;
-      border-bottom: 3px solid transparent;
-      transition: var(--transition);
-      white-space: nowrap;
-      font-size: 0.95rem;
-      position: relative;
-    }
-
-    .tab:hover {
-      color: var(--text-dark);
-    }
-
-    .tab.active {
-      color: var(--cyan-dark);
-      border-bottom-color: var(--cyan-medium);
-    }
-
-    /* ===== FOOTER ===== */
-    footer {
-      background: var(--glass-light);
-      border-top: 1px solid var(--border-glass);
-      padding: 28px 40px;
-      text-align: center;
-      color: var(--text-light);
-      font-size: 0.9rem;
-      margin-top: 60px;
-      margin-left: 280px;
-      backdrop-filter: blur(15px) saturate(1.8);
-    }
-
-    .footer-links {
-      display: flex;
-      justify-content: center;
-      gap: 24px;
-      margin-top: 16px;
-      flex-wrap: wrap;
-    }
-
-    .footer-links a {
-      color: var(--cyan-medium);
-      text-decoration: none;
-      transition: var(--transition);
-      font-weight: 600;
-    }
-
-    .footer-links a:hover {
-      color: var(--cyan-dark);
-      transform: translateY(-2px);
-    }
-
-    /* ===== ICON BUTTON ===== */
-    .icon-btn {
-      width: 40px;
-      height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(6, 182, 212, 0.1);
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: var(--transition);
-      color: var(--text-gray);
-      font-size: 1rem;
-    }
-
-    .icon-btn:hover {
-      background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(20, 184, 166, 0.2));
-      color: var(--cyan-dark);
-      transform: scale(1.1);
-    }
-
-    /* ===== LINK ===== */
-    a {
-      color: var(--cyan-medium);
-      text-decoration: none;
-      transition: var(--transition);
-      font-weight: 600;
-    }
-
-    a:hover {
-      color: var(--cyan-dark);
-      text-decoration: underline;
-    }
-
-    /* ===== RESPONSIVE ===== */
-    @media (max-width: 768px) {
-      header {
-        padding: 16px 20px;
-      }
-
-      .header-content {
-        gap: 12px;
-      }
-
-      .logo-text {
-        display: none;
-      }
-
-      .page-title {
-        font-size: 1.8rem;
-      }
-
-      .grid-2 {
-        grid-template-columns: 1fr;
-      }
-
-      footer {
-        margin-left: 0;
-      }
-    }
-
-    /* ===== ANIMATIONS ===== */
-    @keyframes slideIn {
-      from {
-        opacity: 0;
-        transform: translateX(-20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateX(0);
-      }
-    }
-
-    .stat-box {
-      animation: slideIn 0.6s ease forwards;
-    }
-
-    .stat-box:nth-child(1) { animation-delay: 0.1s; }
-    .stat-box:nth-child(2) { animation-delay: 0.2s; }
-    .stat-box:nth-child(3) { animation-delay: 0.3s; }
-    .stat-box:nth-child(4) { animation-delay: 0.4s; }
-
-    /* ===== COUNTER ANIMATION ===== */
-    .counter {
-      font-variant-numeric: tabular-nums;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Azure Infrastructure Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="white" opacity="0.1"/><circle cx="80" cy="50" r="2" fill="white" opacity="0.1"/><circle cx="50" cy="80" r="2" fill="white" opacity="0.1"/></svg>') repeat;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            animation: slideDown 0.6s ease-out;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            animation: glow 3s infinite;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+            font-weight: 500;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+            animation: fadeIn 0.6s ease-out;
+            border-top: 4px solid #667eea;
+            position: relative;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            border-radius: 12px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, #ffffff, #f5f7ff);
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            display: inline-block;
+            animation: bounce 2s infinite;
+            position: relative;
+            z-index: 2;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .card h2 {
+            color: #667eea;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .card-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #764ba2;
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .status-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #4caf50, #45a049);
+            color: white;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-top: 10px;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+            animation: pulse 2s infinite;
+            position: relative;
+            z-index: 2;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3); }
+            50% { box-shadow: 0 4px 25px rgba(76, 175, 80, 0.6); }
+        }
+
+        .info-section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 0.8s ease-out;
+            border-top: 5px solid;
+            border-top-color: inherit;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .info-section:nth-of-type(1) {
+            border-top-color: #667eea;
+        }
+
+        .info-section:nth-of-type(2) {
+            border-top-color: #764ba2;
+        }
+
+        .info-section::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        .info-section h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .info-item:hover {
+            background: linear-gradient(135deg, #f9f9f9, #f0f4ff);
+            border-left-color: #764ba2;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+            transform: translateX(5px);
+        }
+
+        .info-item strong {
+            color: #333;
+        }
+
+        .info-item span {
+            color: #666;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, letter-spacing 0.2s ease;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        button:hover {
+            transform: scale(1.08) translateY(-2px);
+            box-shadow: 0 12px 30px rgba(102, 126, 234, 0.6);
+            letter-spacing: 1px;
+        }
+
+        button:active {
+            transform: scale(0.98) translateY(0);
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+            padding: 20px;
+        }
+
+        .footer p {
+            opacity: 0.9;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+
+        @keyframes glow {
+            0%, 100% { text-shadow: 0 0 5px rgba(255, 255, 255, 0.5); }
+            50% { text-shadow: 0 0 20px rgba(255, 255, 255, 1); }
+        }
+
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+        }
+
+        .resource-item {
+            background: linear-gradient(135deg, #f9f9f9, #f0f4ff);
+            border-radius: 8px;
+            padding: 15px;
+            border: 2px solid #e0e7ff;
+            transition: all 0.3s ease;
+        }
+
+        .resource-item:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .resource-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e7ff;
+        }
+
+        .resource-name {
+            font-weight: 700;
+            color: #333;
+            font-size: 0.95rem;
+        }
+
+        .status-indicator {
+            font-size: 1.2rem;
+            animation: pulse 1.5s infinite;
+        }
+
+        .status-indicator.success {
+            color: #4caf50;
+        }
+
+        .status-indicator.warning {
+            color: #ff9800;
+        }
+
+        .status-indicator.error {
+            color: #f44336;
+        }
+
+        .resource-details {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .resource-details p {
+            margin: 6px 0;
+            line-height: 1.4;
+        }
+
+        .resource-details strong {
+            color: #333;
+            font-weight: 600;
+        }
+
+        .pipeline-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .pipeline-stage {
+            background: white;
+            border: 2px solid #e0e7ff;
+            border-radius: 10px;
+            padding: 15px;
+            min-width: 120px;
+            text-align: center;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .pipeline-stage:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+            transform: scale(1.05);
+        }
+
+        .stage-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .stage-icon {
+            font-size: 1.5rem;
+            animation: bounce 2s infinite;
+        }
+
+        .stage-name {
+            font-weight: 600;
+            color: #333;
+            font-size: 0.9rem;
+        }
+
+        .stage-status {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .stage-status.completed {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            color: #155724;
+            border: 1px solid #b1dfbb;
+        }
+
+        .stage-status.running {
+            background: linear-gradient(135deg, #cce5ff, #b3d9ff);
+            color: #0056b3;
+            border: 1px solid #8bb3ff;
+            animation: pulse 1.5s infinite;
+        }
+
+        .stage-status.pending {
+            background: linear-gradient(135deg, #fff3cd, #ffe69c);
+            color: #856404;
+            border: 1px solid #ffc107;
+        }
+
+        .pipeline-arrow {
+            font-size: 1.5rem;
+            color: #667eea;
+            font-weight: bold;
+            animation: arrow-animation 1.5s infinite;
+            flex-shrink: 0;
+        }
+
+        @keyframes arrow-animation {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(5px); }
+        }
+
+        .pipeline-summary {
+            background: linear-gradient(135deg, #f0f4ff, #f5f9ff);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            margin-top: 15px;
+        }
+
+        .pipeline-summary p {
+            margin: 8px 0;
+            font-size: 0.95rem;
+            color: #333;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="animated-bg">
-    <div class="gradient-orb orb-1"></div>
-    <div class="gradient-orb orb-2"></div>
-    <div class="gradient-orb orb-3"></div>
-  </div>
-
-  <header>
-    <div class="header-content">
-      <div class="logo" onclick="showSection('overview')">
-        <div class="logo-icon">
-          <i class="fas fa-network-wired"></i>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Azure Infrastructure Dashboard</h1>
+            <p>Terraform Deployed Application on NGINX</p>
         </div>
-        <div class="logo-text">IaC Command Center</div>
-      </div>
 
-      <div class="header-actions">
-        <div class="status-badge">
-          <div class="status-dot"></div>
-          <span>All Systems Green</span>
+        <div class="cards-grid">
+            <div class="card">
+                <div class="card-icon">☁️</div>
+                <h2>Cloud Platform</h2>
+                <p>Running on Microsoft Azure infrastructure with automated deployment via Terraform.</p>
+                <div class="card-value">Microsoft Azure</div>
+                <div class="status-badge">✓ Active</div>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">🔧</div>
+                <h2>Infrastructure as Code</h2>
+                <p>Provisioned using Terraform for consistent and repeatable deployments.</p>
+                <div class="card-value">Terraform v1.9.8+</div>
+                <div class="status-badge">✓ Deployed</div>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">📦</div>
+                <h2>Web Server</h2>
+                <p>High-performance NGINX web server serving this application.</p>
+                <div class="card-value">NGINX</div>
+                <div class="status-badge">✓ Running</div>
+            </div>
         </div>
-        <button class="btn btn-secondary icon-btn" onclick="refreshData()" title="Refresh data">
-          <i class="fas fa-rotate-right"></i>
-        </button>
-      </div>
+
+        <div class="info-section">
+            <h3>📋 Deployment Information</h3>
+            <div class="info-grid">
+                <div class="info-item">
+                    <strong>Region:</strong>
+                    <span>Central India</span>
+                </div>
+                <div class="info-item">
+                    <strong>Resource Group:</strong>
+                    <span>demo-nginx-rg</span>
+                </div>
+                <div class="info-item">
+                    <strong>VM Size:</strong>
+                    <span>Standard_B2ats_v2</span>
+                </div>
+                <div class="info-item">
+                    <strong>OS:</strong>
+                    <span>Ubuntu 22.04 LTS</span>
+                </div>
+                <div class="info-item">
+                    <strong>Environment:</strong>
+                    <span>demo</span>
+                </div>
+                <div class="info-item">
+                    <strong>Deployment Method:</strong>
+                    <span>GitHub Actions</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h3>🎯 Features</h3>
+            <div class="info-grid">
+                <div class="info-item">
+                    <strong>✓</strong>
+                    <span>Automated Infrastructure Provisioning</span>
+                </div>
+                <div class="info-item">
+                    <strong>✓</strong>
+                    <span>Network Security Groups (NSG)</span>
+                </div>
+                <div class="info-item">
+                    <strong>✓</strong>
+                    <span>Public IP for External Access</span>
+                </div>
+                <div class="info-item">
+                    <strong>✓</strong>
+                    <span>CI/CD with GitHub Actions</span>
+                </div>
+                <div class="info-item">
+                    <strong>✓</strong>
+                    <span>Terraform State Management</span>
+                </div>
+                <div class="info-item">
+                    <strong>✓</strong>
+                    <span>Infrastructure as Code Best Practices</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h3>🏗️ Azure Resources Created</h3>
+            <div class="resources-grid">
+                <div class="resource-item">
+                    <div class="resource-header">
+                        <span class="resource-name">Resource Group</span>
+                        <span class="status-indicator success">●</span>
+                    </div>
+                    <div class="resource-details">
+                        <p><strong>Name:</strong> demo-nginx-rg</p>
+                        <p><strong>Region:</strong> Central India</p>
+                    </div>
+                </div>
+
+                <div class="resource-item">
+                    <div class="resource-header">
+                        <span class="resource-name">Virtual Network</span>
+                        <span class="status-indicator success">●</span>
+                    </div>
+                    <div class="resource-details">
+                        <p><strong>Name:</strong> demo-vnet</p>
+                        <p><strong>CIDR:</strong> 10.0.0.0/16</p>
+                    </div>
+                </div>
+
+                <div class="resource-item">
+                    <div class="resource-header">
+                        <span class="resource-name">Subnet</span>
+                        <span class="status-indicator success">●</span>
+                    </div>
+                    <div class="resource-details">
+                        <p><strong>Name:</strong> demo-subnet</p>
+                        <p><strong>CIDR:</strong> 10.0.1.0/24</p>
+                    </div>
+                </div>
+
+                <div class="resource-item">
+                    <div class="resource-header">
+                        <span class="resource-name">Network Security Group</span>
+                        <span class="status-indicator success">●</span>
+                    </div>
+                    <div class="resource-details">
+                        <p><strong>Rules:</strong> Allow SSH, HTTP</p>
+                        <p><strong>Status:</strong> Active</p>
+                    </div>
+                </div>
+
+                <div class="resource-item">
+                    <div class="resource-header">
+                        <span class="resource-name">Public IP</span>
+                        <span class="status-indicator success">●</span>
+                    </div>
+                    <div class="resource-details">
+                        <p><strong>Type:</strong> Static</p>
+                        <p><strong>Allocation:</strong> Active</p>
+                    </div>
+                </div>
+
+                <div class="resource-item">
+                    <div class="resource-header">
+                        <span class="resource-name">Virtual Machine</span>
+                        <span class="status-indicator success">●</span>
+                    </div>
+                    <div class="resource-details">
+                        <p><strong>OS:</strong> Ubuntu 22.04 LTS</p>
+                        <p><strong>Size:</strong> Standard_B2ats_v2</p>
+                    </div>
+                </div>
+
+                <div class="resource-item">
+                    <div class="resource-header">
+                        <span class="resource-name">Storage Account</span>
+                        <span class="status-indicator success">●</span>
+                    </div>
+                    <div class="resource-details">
+                        <p><strong>Type:</strong> General Purpose v2</p>
+                        <p><strong>Replication:</strong> GRS</p>
+                    </div>
+                </div>
+
+                <div class="resource-item">
+                    <div class="resource-header">
+                        <span class="resource-name">Key Vault</span>
+                        <span class="status-indicator success">●</span>
+                    </div>
+                    <div class="resource-details">
+                        <p><strong>Tier:</strong> Standard</p>
+                        <p><strong>Access:</strong> Enabled</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h3>⚙️ GitHub Actions Pipeline</h3>
+            <div class="pipeline-container">
+                <div class="pipeline-stage">
+                    <div class="stage-header">
+                        <div class="stage-icon">📥</div>
+                        <span class="stage-name">Checkout</span>
+                    </div>
+                    <div class="stage-status completed">Completed</div>
+                </div>
+
+                <div class="pipeline-arrow">→</div>
+
+                <div class="pipeline-stage">
+                    <div class="stage-header">
+                        <div class="stage-icon">⚙️</div>
+                        <span class="stage-name">Setup</span>
+                    </div>
+                    <div class="stage-status completed">Completed</div>
+                </div>
+
+                <div class="pipeline-arrow">→</div>
+
+                <div class="pipeline-stage">
+                    <div class="stage-header">
+                        <div class="stage-icon">✓</div>
+                        <span class="stage-name">Validate</span>
+                    </div>
+                    <div class="stage-status completed">Completed</div>
+                </div>
+
+                <div class="pipeline-arrow">→</div>
+
+                <div class="pipeline-stage">
+                    <div class="stage-header">
+                        <div class="stage-icon">📋</div>
+                        <span class="stage-name">Plan</span>
+                    </div>
+                    <div class="stage-status completed">Completed</div>
+                </div>
+
+                <div class="pipeline-arrow">→</div>
+
+                <div class="pipeline-stage">
+                    <div class="stage-header">
+                        <div class="stage-icon">🔒</div>
+                        <span class="stage-name">Security</span>
+                    </div>
+                    <div class="stage-status completed">Completed</div>
+                </div>
+
+                <div class="pipeline-arrow">→</div>
+
+                <div class="pipeline-stage">
+                    <div class="stage-header">
+                        <div class="stage-icon">🚀</div>
+                        <span class="stage-name">Deploy</span>
+                    </div>
+                    <div class="stage-status running">Running</div>
+                </div>
+            </div>
+            <div class="pipeline-summary">
+                <p><strong>Last Run:</strong> <span id="lastRun">Just now</span></p>
+                <p><strong>Duration:</strong> <span id="duration">~2 minutes</span></p>
+                <p><strong>Overall Status:</strong> <span style="color: #667eea; font-weight: bold;">In Progress ◐</span></p>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button onclick="reloadPage()">🔄 Refresh</button>
+            <button onclick="showInfo()">ℹ️ More Info</button>
+            <button onclick="copyInfo()">📋 Copy Details</button>
+        </div>
+
+        <div class="footer">
+            <p>Built with ❤️ using Terraform, Azure, and GitHub Actions</p>
+            <p style="font-size: 0.9rem; margin-top: 10px;">Deployed: <span id="deployTime"></span></p>
+        </div>
     </div>
-  </header>
 
-  <aside class="sidebar">
-    <div class="sidebar-title">Navigation</div>
-    <div class="nav-menu">
-      <button class="nav-item active" data-section="overview" onclick="navigateTo('overview')">
-        <i class="fas fa-home"></i> Overview
-      </button>
-      <button class="nav-item" data-section="terraform" onclick="navigateTo('terraform')">
-        <i class="fas fa-leaf"></i> Terraform
-      </button>
-      <button class="nav-item" data-section="workflows" onclick="navigateTo('workflows')">
-        <i class="fab fa-github"></i> Workflows
-      </button>
-      <button class="nav-item" data-section="azure" onclick="navigateTo('azure')">
-        <i class="fas fa-cloud"></i> Azure
-      </button>
-      <button class="nav-item" data-section="configuration" onclick="navigateTo('configuration')">
-        <i class="fas fa-cog"></i> Configuration
-      </button>
-    </div>
-
-    <div class="sidebar-title" style="margin-top: 32px;">Resources</div>
-    <div class="nav-menu">
-      <a class="nav-item" href="https://www.terraform.io/docs" target="_blank" title="Terraform Documentation">
-        <i class="fas fa-book"></i> Terraform Docs
-      </a>
-      <a class="nav-item" href="https://github.com/hashicorp/terraform-provider-azurerm" target="_blank" title="Azure Provider">
-        <i class="fas fa-code-branch"></i> Azure Provider
-      </a>
-      <a class="nav-item" href="https://github.com" target="_blank" title="GitHub">
-        <i class="fab fa-github"></i> GitHub
-      </a>
-      <a class="nav-item" href="https://portal.azure.com" target="_blank" title="Azure Portal">
-        <i class="fas fa-globe"></i> Azure Portal
-      </a>
-    </div>
-  </aside>
-
-  <main>
-    <!-- ===== OVERVIEW SECTION ===== -->
-    <section class="section active" id="overview">
-      <div class="page-header">
-        <h1 class="page-title">
-          <i class="fas fa-gauge-high" style="margin-right: 12px;"></i>Overview
-        </h1>
-        <p class="page-subtitle">Real-time infrastructure status and key metrics</p>
-      </div>
-
-      <div class="grid grid-4">
-        <div class="stat-box">
-          <div class="stat-number counter" id="resourceCount">0</div>
-          <div class="stat-label">Terraform Resources</div>
-          <div class="stat-unit">Managed & Active</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-number counter" id="workflowCount">0</div>
-          <div class="stat-label">CI/CD Workflows</div>
-          <div class="stat-unit">GitHub Actions</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-number counter" id="azureCount">0</div>
-          <div class="stat-label">Azure Resources</div>
-          <div class="stat-unit">Deployed</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-number counter" id="uptime">99</div>
-          <div class="stat-label">System Uptime</div>
-          <div class="stat-unit">% Availability</div>
-        </div>
-      </div>
-
-      <div class="grid grid-2" style="margin-top: 32px;">
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title-section">
-              <div class="card-icon">
-                <i class="fas fa-sitemap"></i>
-              </div>
-              <div>
-                <div class="card-title">Infrastructure Architecture</div>
-                <div class="card-subtitle">7 Azure resources deployed</div>
-              </div>
-            </div>
-            <div class="card-badge">Active</div>
-          </div>
-
-          <div class="architecture-grid">
-            <div class="arch-box">
-              <div class="arch-icon">📦</div>
-              <div class="arch-name">Resource Group</div>
-              <div class="arch-type">Container</div>
-            </div>
-            <div class="arch-box">
-              <div class="arch-icon">🌐</div>
-              <div class="arch-name">VNet</div>
-              <div class="arch-type">Network</div>
-            </div>
-            <div class="arch-box">
-              <div class="arch-icon">📡</div>
-              <div class="arch-name">Subnet</div>
-              <div class="arch-type">Network</div>
-            </div>
-            <div class="arch-box">
-              <div class="arch-icon">🛡️</div>
-              <div class="arch-name">NSG</div>
-              <div class="arch-type">Security</div>
-            </div>
-            <div class="arch-box">
-              <div class="arch-icon">🌍</div>
-              <div class="arch-name">Public IP</div>
-              <div class="arch-type">Network</div>
-            </div>
-            <div class="arch-box">
-              <div class="arch-icon">🔌</div>
-              <div class="arch-name">NIC</div>
-              <div class="arch-type">Interface</div>
-            </div>
-            <div class="arch-box">
-              <div class="arch-icon">💻</div>
-              <div class="arch-name">Linux VM</div>
-              <div class="arch-type">Compute</div>
-            </div>
-          </div>
-
-          <div class="info-panel" style="margin-top: 20px;">
-            <div class="info-title">✓ Architecture Status</div>
-            <div class="info-text">All 7 resources are deployed and running in Central India region. Network traffic flows through NSG with HTTP (80) and SSH (22) allowed.</div>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title-section">
-              <div class="card-icon" style="background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(236, 72, 153, 0.15)); color: var(--purple-medium);">
-                <i class="fas fa-sliders-h"></i>
-              </div>
-              <div>
-                <div class="card-title">Deployment Environment</div>
-                <div class="card-subtitle">Configuration snapshot</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="metric">
-            <span class="metric-label">Environment</span>
-            <span class="metric-value">demo</span>
-          </div>
-          <div class="metric">
-            <span class="metric-label">Region</span>
-            <span class="metric-value">Central India</span>
-          </div>
-          <div class="metric">
-            <span class="metric-label">VM Size</span>
-            <span class="metric-value">Standard_B2ats_v2</span>
-          </div>
-          <div class="metric">
-            <span class="metric-label">State Backend</span>
-            <span class="metric-value">Azure Storage</span>
-          </div>
-          <div class="metric">
-            <span class="metric-label">Auth Method</span>
-            <span class="metric-value">OIDC</span>
-          </div>
-
-          <div class="badge-group" style="margin-top: 20px;">
-            <div class="badge terraform">Terraform v1.9.8</div>
-            <div class="badge azure">Provider v4.57.0</div>
-            <div class="badge github">OIDC Enabled</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===== TERRAFORM SECTION ===== -->
-    <section class="section" id="terraform">
-      <div class="page-header">
-        <h1 class="page-title">
-          <i class="fas fa-leaf" style="margin-right: 12px;"></i>Terraform Configuration
-        </h1>
-        <p class="page-subtitle">IaC definitions, resources, and variables</p>
-      </div>
-
-      <div class="grid grid-2">
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title-section">
-              <div class="card-icon">
-                <i class="fas fa-cube"></i>
-              </div>
-              <div>
-                <div class="card-title">Managed Resources</div>
-                <div class="card-subtitle">7 total resources</div>
-              </div>
-            </div>
-          </div>
-          <div id="resourcesList"></div>
-        </div>
-
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title-section">
-              <div class="card-icon" style="background: linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(34, 197, 94, 0.08)); color: var(--green-medium);">
-                <i class="fas fa-sliders-h"></i>
-              </div>
-              <div>
-                <div class="card-title">Input Variables</div>
-                <div class="card-subtitle">Demo environment values</div>
-              </div>
-            </div>
-          </div>
-          <div id="variablesList"></div>
-        </div>
-      </div>
-
-      <div class="card" style="margin-top: 24px;">
-        <div class="card-header">
-          <div class="card-title-section">
-            <div class="card-icon">
-              <i class="fas fa-file-code"></i>
-            </div>
-            <div>
-              <div class="card-title">Configuration Files</div>
-              <div class="card-subtitle">Source code overview</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="tabs">
-          <button class="tab active" onclick="switchTab('provider')">provider.tf</button>
-          <button class="tab" onclick="switchTab('main')">main.tf</button>
-          <button class="tab" onclick="switchTab('variables')">variables.tf</button>
-          <button class="tab" onclick="switchTab('outputs')">outputs.tf</button>
-        </div>
-
-        <div id="provider-content" class="tab-content">
-          <div class="code-label">Azure Provider & Backend Configuration</div>
-          <div class="code-block">
-            <pre>terraform {
-  required_version = ">= 1.3"
-  
-  backend "azurerm" {
-    resource_group_name  = "terraform-iac-poc-tfstate-rg"
-    storage_account_name = "terraformiacpoctfstatesa"
-    container_name       = "tfstatecontainer"
-    key                  = "terraform.tfstate"
-  }
-
-  required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = ">= 3.0.0"
-    }
-  }
-}
-
-provider "azurerm" {
-  subscription_id = "f805bc8d-1c98-4d3b-85d2-f2adea26cb5b"
-  features {}
-}</pre>
-          </div>
-        </div>
-
-        <div id="main-content" class="tab-content" style="display: none;">
-          <div class="code-label">Resource Group & Virtual Network</div>
-          <div class="code-block">
-            <pre>resource "azurerm_resource_group" "rg" {
-  name     = "${var.env_prefix}-${var.resource_group_name}"
-  location = var.location
-  tags     = var.tags
-}
-
-resource "azurerm_virtual_network" "vnet" {
-  name                = "${var.env_prefix}-${var.vnet_name}"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-  address_space       = var.vnet_cidir
-  tags                = var.tags
-}</pre>
-          </div>
-        </div>
-
-        <div id="variables-content" class="tab-content" style="display: none;">
-          <div class="code-label">Input Variables Declaration</div>
-          <div class="code-block">
-            <pre>variable "env_prefix" {
-  description = "Environment prefix"
-  type        = string
-  default     = "demo"
-}
-
-variable "location" {
-  description = "Azure region"
-  type        = string
-  default     = "East US"
-}
-
-variable "vm_size" {
-  description = "VM size"
-  type        = string
-  default     = "Standard_B2ats_v2"
-}</pre>
-          </div>
-        </div>
-
-        <div id="outputs-content" class="tab-content" style="display: none;">
-          <div class="code-label">Output Values</div>
-          <div class="code-block">
-            <pre>output "access_message" {
-  value = "Nginx application is accessible at http://${azurerm_public_ip.pip.ip_address}"
-}</pre>
-          </div>
-        </div>
-
-        <div class="badge-group" style="margin-top: 20px;">
-          <div class="badge terraform">Local Files</div>
-          <div class="badge">provider.tf (421B)</div>
-          <div class="badge">main.tf (2.8KB)</div>
-          <div class="badge">variables.tf (1.2KB)</div>
-          <div class="badge">outputs.tf (245B)</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===== WORKFLOWS SECTION ===== -->
-    <section class="section" id="workflows">
-      <div class="page-header">
-        <h1 class="page-title">
-          <i class="fab fa-github" style="margin-right: 12px;"></i>GitHub Actions
-        </h1>
-        <p class="page-subtitle">CI/CD pipeline configuration and execution</p>
-      </div>
-
-      <div class="grid grid-2">
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title-section">
-              <div class="card-icon" style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.15), rgba(71, 85, 105, 0.15)); color: var(--text-dark);">
-                <i class="fab fa-github"></i>
-              </div>
-              <div>
-                <div class="card-title">terraform-deploy.yaml</div>
-                <div class="card-subtitle">Plan & Apply Workflow</div>
-              </div>
-            </div>
-            <div class="card-badge">Active</div>
-          </div>
-
-          <div class="workflow-step success">
-            <div class="workflow-step-icon">1</div>
-            <div class="workflow-step-info">
-              <div class="workflow-step-title">Checkout Repository</div>
-              <div class="workflow-step-desc">Pull latest code from main branch</div>
-            </div>
-          </div>
-
-          <div class="workflow-step success">
-            <div class="workflow-step-icon">2</div>
-            <div class="workflow-step-info">
-              <div class="workflow-step-title">Setup Terraform</div>
-              <div class="workflow-step-desc">Install Terraform v1.9.8</div>
-            </div>
-          </div>
-
-          <div class="workflow-step success">
-            <div class="workflow-step-icon">3</div>
-            <div class="workflow-step-info">
-              <div class="workflow-step-title">Terraform Init</div>
-              <div class="workflow-step-desc">Initialize backend & providers</div>
-            </div>
-          </div>
-
-          <div class="workflow-step">
-            <div class="workflow-step-icon">4</div>
-            <div class="workflow-step-info">
-              <div class="workflow-step-title">Format & Validate</div>
-              <div class="workflow-step-desc">Ensure code quality & syntax</div>
-            </div>
-          </div>
-
-          <div class="workflow-step">
-            <div class="workflow-step-icon">5</div>
-            <div class="workflow-step-info">
-              <div class="workflow-step-title">Terraform Plan</div>
-              <div class="workflow-step-desc">Generate execution plan</div>
-            </div>
-          </div>
-
-          <div class="workflow-step warning">
-            <div class="workflow-step-icon">⚠</div>
-            <div class="workflow-step-info">
-              <div class="workflow-step-title">Security Approval Gate</div>
-              <div class="workflow-step-desc">Manual review required before apply</div>
-            </div>
-          </div>
-
-          <div class="workflow-step">
-            <div class="workflow-step-icon">6</div>
-            <div class="workflow-step-info">
-              <div class="workflow-step-title">Terraform Apply</div>
-              <div class="workflow-step-desc">Deploy changes to Azure</div>
-            </div>
-          </div>
-
-          <div class="badge-group" style="margin-top: 16px;">
-            <div class="badge github">workflow_dispatch</div>
-            <div class="badge">Manual Trigger</div>
-            <div class="badge">ubuntu-latest</div>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title-section">
-              <div class="card-icon" style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.15), rgba(71, 85, 105, 0.15)); color: var(--text-dark);">
-                <i class="fab fa-github"></i>
-              </div>
-              <div>
-                <div class="card-title">terraform-destroy.yaml</div>
-                <div class="card-subtitle">Infrastructure Teardown</div>
-              </div>
-            </div>
-            <div class="card-badge">Active</div>
-          </div>
-
-          <div class="workflow-step success">
-            <div class="workflow-step-icon">1</div>
-            <div class="workflow-step-info">
-              <div class="workflow-step-title">Checkout Repository</div>
-              <div class="workflow-step-desc">Pull latest code</div>
-            </div>
-          </div>
-
-          <div class="workflow-step success">
-            <div class="workflow-step-icon">2</div>
-            <div class="workflow-step-info">
-              <div class="workflow-step-title">Setup Terraform</div>
-              <div class="workflow-step-desc">Install Terraform v1.9.8</div>
-            </div>
-          </div>
-
-          <div class="workflow-step danger">
-            <div class="workflow-step-icon">⚠</div>
-            <div class="workflow-step-info">
-              <div class="workflow-step-title">Terraform Destroy</div>
-              <div class="workflow-step-desc">Remove all managed infrastructure</div>
-            </div>
-          </div>
-
-          <div class="info-panel danger" style="margin-top: 16px;">
-            <div class="info-title">⚠ Destructive Operation</div>
-            <div class="info-text">This workflow permanently removes all Azure resources managed by Terraform. Manual dispatch trigger only.</div>
-          </div>
-
-          <div class="badge-group" style="margin-top: 16px;">
-            <div class="badge github">workflow_dispatch</div>
-            <div class="badge">Manual Trigger</div>
-            <div class="badge">Irreversible</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card" style="margin-top: 24px;">
-        <div class="card-header">
-          <div class="card-title-section">
-            <div class="card-icon" style="background: linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(34, 197, 94, 0.08)); color: var(--green-medium);">
-              <i class="fas fa-env"></i>
-            </div>
-            <div>
-              <div class="card-title">Environment Variables</div>
-              <div class="card-subtitle">GitHub Actions secrets & configuration</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="grid grid-3">
-          <div class="metric">
-            <span class="metric-label">ARM_SUBSCRIPTION_ID</span>
-            <span class="metric-value" style="font-size: 0.9rem; font-family: 'Space Mono';">secret</span>
-          </div>
-          <div class="metric">
-            <span class="metric-label">ARM_CLIENT_ID</span>
-            <span class="metric-value" style="font-size: 0.9rem; font-family: 'Space Mono';">secret</span>
-          </div>
-          <div class="metric">
-            <span class="metric-label">ARM_TENANT_ID</span>
-            <span class="metric-value" style="font-size: 0.9rem; font-family: 'Space Mono';">secret</span>
-          </div>
-          <div class="metric">
-            <span class="metric-label">TF_VERSION</span>
-            <span class="metric-value">1.9.8</span>
-          </div>
-          <div class="metric">
-            <span class="metric-label">ARM_USE_OIDC</span>
-            <span class="metric-value">true</span>
-          </div>
-          <div class="metric">
-            <span class="metric-label">env_prefix</span>
-            <span class="metric-value">demo</span>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===== AZURE SECTION ===== -->
-    <section class="section" id="azure">
-      <div class="page-header">
-        <h1 class="page-title">
-          <i class="fas fa-cloud" style="margin-right: 12px;"></i>Azure Infrastructure
-        </h1>
-        <p class="page-subtitle">Deployed resources in Central India</p>
-      </div>
-
-      <div class="grid grid-2">
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title-section">
-              <div class="card-icon" style="background: linear-gradient(135deg, rgba(14, 165, 233, 0.15), rgba(14, 165, 233, 0.08)); color: var(--blue-medium);">
-                <i class="fas fa-layer-group"></i>
-              </div>
-              <div>
-                <div class="card-title">Resource Group</div>
-                <div class="card-subtitle">Container & management</div>
-              </div>
-            </div>
-            <div class="card-badge azure">Deployed</div>
-          </div>
-
-          <div class="metric">
-            <span class="metric-label">Name</span>
-            <span class="metric-value">demo-nginx-rg</span>
-          </div>
-          <div class="metric">
-            <span class="metric-label">Location</span>
-            <span class="metric-value">Central India</span>
-          </div>
-          <div class="metric">
-            <span class="metric-label">Resources</span>
-            <span class="metric-value">7</span>
-          </div>
-
-          <a href="https://portal.azure.com" target="_blank" class="btn btn-primary" style="width: 100%; margin-top: 16px; justify-content: center;">
-            <i class="fas fa-external-link-alt"></i> Open in Azure Portal
-          </a>
-        </div>
-
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title-section">
-              <div class="card-icon" style="background: linear-gradient(135deg, rgba(14, 165, 233, 0.15), rgba(14, 165, 233, 0.08)); color: var(--blue-medium);">
-                <i class="fas fa-server"></i>
-              </div>
-              <div>
-                <div class="card-title">Virtual Machine</div>
-                <div class="card-subtitle">Compute instance</div>
-              </div>
-            </div>
-            <div class="card-badge azure">Running</div>
-          </div>
-
-          <div class="metric">
-            <span class="metric-label">VM Name</span>
-            <span class="metric-value">nginx-vm</span>
-          </div>
-          <div class="metric">
-            <span class="metric-label">Size</span>
-            <span class="metric-value">Standard_B2ats_v2</span>
-          </div>
-          <div class="metric">
-            <span class="metric-label">OS</span>
-            <span class="metric-value">Ubuntu 22.04 LTS</span>
-          </div>
-
-          <a href="https://portal.azure.com" target="_blank" class="btn btn-primary" style="width: 100%; margin-top: 16px; justify-content: center;">
-            <i class="fas fa-external-link-alt"></i> View VM Details
-          </a>
-        </div>
-      </div>
-
-      <div class="grid grid-3" style="margin-top: 24px;">
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title-section">
-              <div class="card-icon" style="background: linear-gradient(135deg, rgba(14, 165, 233, 0.15), rgba(14, 165, 233, 0.08)); color: var(--blue-medium);">
-                <i class="fas fa-network-wired"></i>
-              </div>
-              <div>
-                <div class="card-title">Virtual Network</div>
-                <div class="card-subtitle">Network isolation</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="metric">
-            <span class="metric-label">VNet Name</span>
-            <span class="metric-value">demo-nginx-vnet</span>
-          </div>
-          <div class="metric">
-            <span class="metric-label">Address Space</span>
-            <span class="metric-value">10.0.0.0/16</span>
-          </div>
-          <div class="metric">
-            <span class="metric-label">Subnets</span>
-            <span class="metric-value">1</span>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title-section">
-              <div class="card-icon" style="background: linear-gradient(135deg, rgba(14, 165, 233, 0.15), rgba(14, 165, 233, 0.08)); color: var(--blue-medium);">
-                <i class="fas fa-sitemap"></i>
-              </div>
-              <div>
-                <div class="card-title">Subnet</div>
-                <div class="card-subtitle">Subnet configuration</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="metric">
-            <span class="metric-label">Subnet Name</span>
-            <span class="metric-value">nginx-subnet</span>
-          </div>
-          <div class="metric">
-            <span class="metric-label">Address Range</span>
-            <span class="metric-value">10.0.1.0/24</span>
-          </div>
-          <div class="metric">
-            <span class="metric-label">Hosts</span>
-            <span class="metric-value">251</span>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title-section">
-              <div class="card-icon" style="background: linear-gradient(135deg, rgba(14, 165, 233, 0.15), rgba(14, 165, 233, 0.08)); color: var(--blue-medium);">
-                <i class="fas fa-globe"></i>
-              </div>
-              <div>
-                <div class="card-title">Public IP</div>
-                <div class="card-subtitle">External access</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="metric">
-            <span class="metric-label">IP Name</span>
-            <span class="metric-value">nginx-pip</span>
-          </div>
-          <div class="metric">
-            <span class="metric-label">Allocation</span>
-            <span class="metric-value">Static</span>
-          </div>
-          <div class="metric">
-            <span class="metric-label">SKU</span>
-            <span class="metric-value">Standard</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="card" style="margin-top: 24px;">
-        <div class="card-header">
-          <div class="card-title-section">
-            <div class="card-icon" style="background: linear-gradient(135deg, rgba(14, 165, 233, 0.15), rgba(14, 165, 233, 0.08)); color: var(--blue-medium);">
-              <i class="fas fa-shield-alt"></i>
-            </div>
-            <div>
-              <div class="card-title">Network Security Group</div>
-              <div class="card-subtitle">Inbound security rules</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="resource-item">
-          <div class="resource-icon">
-            <i class="fas fa-arrow-down"></i>
-          </div>
-          <div class="resource-info">
-            <div class="resource-name">Allow-HTTP</div>
-            <div class="resource-details">Priority: 100 | Port: 80 | All Sources</div>
-          </div>
-          <div class="resource-badge">Active</div>
-        </div>
-
-        <div class="resource-item">
-          <div class="resource-icon">
-            <i class="fas fa-arrow-down"></i>
-          </div>
-          <div class="resource-info">
-            <div class="resource-name">Allow-SSH</div>
-            <div class="resource-details">Priority: 110 | Port: 22 | All Sources</div>
-          </div>
-          <div class="resource-badge">Active</div>
-        </div>
-      </div>
-
-      <div class="grid grid-2" style="margin-top: 24px;">
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title-section">
-              <div class="card-icon" style="background: linear-gradient(135deg, rgba(14, 165, 233, 0.15), rgba(14, 165, 233, 0.08)); color: var(--blue-medium);">
-                <i class="fas fa-ethernet"></i>
-              </div>
-              <div>
-                <div class="card-title">Network Interface</div>
-                <div class="card-subtitle">VM connection</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="metric">
-            <span class="metric-label">NIC Name</span>
-            <span class="metric-value">nginx-nic</span>
-          </div>
-          <div class="metric">
-            <span class="metric-label">Associated VM</span>
-            <span class="metric-value">nginx-vm</span>
-          </div>
-          <div class="metric">
-            <span class="metric-label">Subnet</span>
-            <span class="metric-value">nginx-subnet</span>
-          </div>
-          <div class="metric">
-            <span class="metric-label">IP Allocation</span>
-            <span class="metric-value">Dynamic</span>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title-section">
-              <div class="card-icon" style="background: linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(34, 197, 94, 0.08)); color: var(--green-medium);">
-                <i class="fas fa-tags"></i>
-              </div>
-              <div>
-                <div class="card-title">Resource Tags</div>
-                <div class="card-subtitle">Metadata labels</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="badge-group">
-            <div class="badge azure">environment: demo</div>
-            <div class="badge azure">deployed_by: terraform</div>
-            <div class="badge azure">owner: github</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===== CONFIGURATION SECTION ===== -->
-    <section class="section" id="configuration">
-      <div class="page-header">
-        <h1 class="page-title">
-          <i class="fas fa-cog" style="margin-right: 12px;"></i>Configuration
-        </h1>
-        <p class="page-subtitle">Project files and environment setup</p>
-      </div>
-
-      <div class="grid grid-2">
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title-section">
-              <div class="card-icon">
-                <i class="fas fa-file-code"></i>
-              </div>
-              <div>
-                <div class="card-title">Terraform Files</div>
-                <div class="card-subtitle">Infrastructure as Code</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="resource-item">
-            <div class="resource-icon"><i class="fas fa-file"></i></div>
-            <div class="resource-info">
-              <div class="resource-name">provider.tf</div>
-              <div class="resource-details">Backend & provider config • 421 B</div>
-            </div>
-            <div class="resource-badge">Core</div>
-          </div>
-
-          <div class="resource-item">
-            <div class="resource-icon"><i class="fas fa-file"></i></div>
-            <div class="resource-info">
-              <div class="resource-name">main.tf</div>
-              <div class="resource-details">All infrastructure resources • 2.8 KB</div>
-            </div>
-            <div class="resource-badge">Core</div>
-          </div>
-
-          <div class="resource-item">
-            <div class="resource-icon"><i class="fas fa-file"></i></div>
-            <div class="resource-info">
-              <div class="resource-name">variables.tf</div>
-              <div class="resource-details">Input variables • 1.2 KB</div>
-            </div>
-            <div class="resource-badge">Config</div>
-          </div>
-
-          <div class="resource-item">
-            <div class="resource-icon"><i class="fas fa-file"></i></div>
-            <div class="resource-info">
-              <div class="resource-name">outputs.tf</div>
-              <div class="resource-details">Output values • 245 B</div>
-            </div>
-            <div class="resource-badge">Config</div>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title-section">
-              <div class="card-icon" style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.15), rgba(71, 85, 105, 0.15)); color: var(--text-dark);">
-                <i class="fab fa-github"></i>
-              </div>
-              <div>
-                <div class="card-title">GitHub Workflows</div>
-                <div class="card-subtitle">CI/CD automation</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="resource-item">
-            <div class="resource-icon"><i class="fab fa-github"></i></div>
-            <div class="resource-info">
-              <div class="resource-name">terraform-deploy.yaml</div>
-              <div class="resource-details">Plan & Apply workflow • 1.1 KB</div>
-            </div>
-            <div class="resource-badge">Active</div>
-          </div>
-
-          <div class="resource-item">
-            <div class="resource-icon"><i class="fab fa-github"></i></div>
-            <div class="resource-info">
-              <div class="resource-name">terraform-destroy.yaml</div>
-              <div class="resource-details">Destroy workflow • 856 B</div>
-            </div>
-            <div class="resource-badge">Active</div>
-          </div>
-
-          <a href="https://github.com" target="_blank" class="btn btn-primary" style="width: 100%; margin-top: 16px; justify-content: center;">
-            <i class="fab fa-github"></i> Open GitHub Repository
-          </a>
-        </div>
-      </div>
-
-      <div class="card" style="margin-top: 24px;">
-        <div class="card-header">
-          <div class="card-title-section">
-            <div class="card-icon" style="background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(236, 72, 153, 0.15)); color: var(--purple-medium);">
-              <i class="fas fa-database"></i>
-            </div>
-            <div>
-              <div class="card-title">Terraform State Backend</div>
-              <div class="card-subtitle">Remote state management</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="code-label">Azure Storage Backend Configuration</div>
-        <div class="code-block">
-          <pre>terraform {
-  backend "azurerm" {
-    resource_group_name  = "terraform-iac-poc-tfstate-rg"
-    storage_account_name = "terraformiacpoctfstatesa"
-    container_name       = "tfstatecontainer"
-    key                  = "terraform.tfstate"
-  }
-}</pre>
-        </div>
-
-        <div class="grid grid-3" style="margin-top: 20px;">
-          <div class="metric">
-            <span class="metric-label">Storage Account</span>
-            <span class="metric-value" style="font-size: 0.85rem;">terraformiacpoctfstatesa</span>
-          </div>
-          <div class="metric">
-            <span class="metric-label">Container</span>
-            <span class="metric-value">tfstatecontainer</span>
-          </div>
-          <div class="metric">
-            <span class="metric-label">Key</span>
-            <span class="metric-value">terraform.tfstate</span>
-          </div>
-        </div>
-
-        <a href="https://portal.azure.com" target="_blank" class="btn btn-primary" style="margin-top: 16px;">
-          <i class="fas fa-external-link-alt"></i> View Storage Account
-        </a>
-      </div>
-
-      <div class="info-panel" style="margin-top: 24px;">
-        <div class="info-title">✓ Recommended Resources</div>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 12px;">
-          <a href="https://www.terraform.io/docs" target="_blank" class="btn btn-secondary" style="justify-content: center;">
-            <i class="fas fa-book"></i> Terraform Documentation
-          </a>
-          <a href="https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs" target="_blank" class="btn btn-secondary" style="justify-content: center;">
-            <i class="fas fa-cube"></i> Azure Provider Docs
-          </a>
-          <a href="https://github.com/hashicorp/terraform-provider-azurerm" target="_blank" class="btn btn-secondary" style="justify-content: center;">
-            <i class="fab fa-github"></i> Provider Repository
-          </a>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <footer>
-    <div>IaC Command Center • Terraform · GitHub Actions · Azure Infrastructure</div>
-    <div class="footer-links">
-      <a href="#" onclick="showSection('overview'); return false;">Overview</a>
-      <a href="#" onclick="showSection('terraform'); return false;">Terraform</a>
-      <a href="#" onclick="showSection('workflows'); return false;">Workflows</a>
-      <a href="#" onclick="showSection('azure'); return false;">Azure</a>
-      <a href="#" onclick="showSection('configuration'); return false;">Configuration</a>
-      <a href="https://github.com" target="_blank">GitHub</a>
-      <a href="https://portal.azure.com" target="_blank">Azure Portal</a>
-    </div>
-  </footer>
-
-  <script>
-    // Data configuration
-    const data = {
-      resources: [
-        { name: "azurerm_resource_group", icon: "📦", type: "Container" },
-        { name: "azurerm_virtual_network", icon: "🌐", type: "Network" },
-        { name: "azurerm_subnet", icon: "📡", type: "Network" },
-        { name: "azurerm_network_security_group", icon: "🛡️", type: "Security" },
-        { name: "azurerm_public_ip", icon: "🌍", type: "Network" },
-        { name: "azurerm_network_interface", icon: "🔌", type: "Interface" },
-        { name: "azurerm_linux_virtual_machine", icon: "💻", type: "Compute" }
-      ],
-      variables: [
-        { name: "env_prefix", value: "demo", type: "string" },
-        { name: "location", value: "Central India", type: "string" },
-        { name: "vm_size", value: "Standard_B2ats_v2", type: "string" },
-        { name: "vm_admin_username", value: "azureuser", type: "string" },
-        { name: "vnet_cidr", value: "10.0.0.0/16", type: "string" }
-      ]
-    };
-
-    // Navigation functions
-    function navigateTo(section) {
-      showSection(section);
-    }
-
-    function showSection(sectionId) {
-      const sections = document.querySelectorAll('.section');
-      const navItems = document.querySelectorAll('.nav-item');
-
-      sections.forEach(s => s.classList.remove('active'));
-      navItems.forEach(i => i.classList.remove('active'));
-
-      const section = document.getElementById(sectionId);
-      const navItem = document.querySelector(`[data-section="${sectionId}"]`);
-
-      if (section) {
-        section.classList.add('active');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
-      if (navItem) {
-        navItem.classList.add('active');
-      }
-    }
-
-    // Populate resources list
-    const resourcesList = document.getElementById('resourcesList');
-    data.resources.forEach(resource => {
-      const html = `
-        <div class="resource-item">
-          <div class="resource-icon" style="font-size: 1.3rem; background: transparent;">${resource.icon}</div>
-          <div class="resource-info">
-            <div class="resource-name">${resource.name}</div>
-            <div class="resource-details">Type: ${resource.type}</div>
-          </div>
-          <div class="resource-badge">Managed</div>
-        </div>
-      `;
-      resourcesList.innerHTML += html;
-    });
-
-    // Populate variables list
-    const variablesList = document.getElementById('variablesList');
-    data.variables.forEach(variable => {
-      const html = `
-        <div class="resource-item">
-          <div class="resource-icon"><i class="fas fa-sliders-h"></i></div>
-          <div class="resource-info">
-            <div class="resource-name">${variable.name}</div>
-            <div class="resource-details">${variable.value} • ${variable.type}</div>
-          </div>
-          <div class="resource-badge">${variable.type}</div>
-        </div>
-      `;
-      variablesList.innerHTML += html;
-    });
-
-    // Tab switching
-    function switchTab(tabName) {
-      const tabs = document.querySelectorAll('.tab');
-      const contents = document.querySelectorAll('.tab-content');
-
-      tabs.forEach(t => t.classList.remove('active'));
-      contents.forEach(c => c.style.display = 'none');
-
-      document.querySelector(`[onclick="switchTab('${tabName}')"]`).classList.add('active');
-      document.getElementById(`${tabName}-content`).style.display = 'block';
-    }
-
-    // Counter animation
-    function animateCounter(element, target, duration = 2000) {
-      let current = 0;
-      const increment = target / (duration / 16);
-      const timer = setInterval(() => {
-        current += increment;
-        if (current >= target) {
-          element.textContent = target;
-          clearInterval(timer);
-        } else {
-          element.textContent = Math.floor(current);
+    <script>
+        // Set deployment time with dynamic updates
+        function initializeDeploymentTime() {
+            const now = new Date();
+            document.getElementById('deployTime').textContent = now.toLocaleString();
+            document.getElementById('lastRun').textContent = 'Just now';
+            updatePipelineStatus();
         }
-      }, 16);
-    }
 
-    // Initialize counters
-    window.addEventListener('load', () => {
-      animateCounter(document.getElementById('resourceCount'), 7);
-      animateCounter(document.getElementById('workflowCount'), 2);
-      animateCounter(document.getElementById('azureCount'), 7);
-      animateCounter(document.getElementById('uptime'), 99);
-    });
+        // Update pipeline status
+        function updatePipelineStatus() {
+            setInterval(() => {
+                const stages = document.querySelectorAll('.pipeline-stage');
+                const randomStageIndex = Math.floor(Math.random() * stages.length);
+                
+                // Cycle through stages randomly for demo purposes
+                stages.forEach((stage, index) => {
+                    const status = stage.querySelector('.stage-status');
+                    if (index <= randomStageIndex) {
+                        status.className = 'stage-status completed';
+                        status.textContent = 'Completed';
+                    } else if (index === randomStageIndex + 1) {
+                        status.className = 'stage-status running';
+                        status.textContent = 'Running';
+                    } else {
+                        status.className = 'stage-status pending';
+                        status.textContent = 'Pending';
+                    }
+                });
+            }, 5000);
+        }
 
-    // Refresh function
-    function refreshData() {
-      const btn = event.target.closest('.icon-btn');
-      btn.style.animation = 'none';
-      setTimeout(() => {
-        btn.style.animation = 'spin 1s ease';
-      }, 10);
-      console.log('Dashboard refreshed');
-    }
+        // Calculate and display uptime
+        function updateUptime() {
+            setInterval(() => {
+                const deployTime = new Date();
+                const currentTime = new Date();
+                const uptime = currentTime - deployTime;
+                const hours = Math.floor(uptime / 3600000);
+                const minutes = Math.floor((uptime % 3600000) / 60000);
+            }, 60000);
+        }
 
-    // Add spin animation
-    const style = document.createElement('style');
-    style.textContent = `
-      @keyframes spin {
-        from { transform: rotate(0deg); }
-        to { transform: rotate(360deg); }
-      }
-    `;
-    document.head.appendChild(style);
-  </script>
+        function reloadPage() {
+            location.reload();
+        }
+
+        function showInfo() {
+            const userAgent = navigator.userAgent;
+            const isAzure = window.location.hostname.includes('azure') || window.location.hostname.includes('.');
+            
+            alert('🎉 Welcome to Azure Infrastructure Dashboard!\n\n' +
+                'This application is running on:\n' +
+                '• Cloud: Microsoft Azure ☁️\n' +
+                '• IaC: Terraform v1.9.8+ 🔧\n' +
+                '• Web Server: NGINX 📦\n' +
+                '• Region: Central India 🌍\n' +
+                '• CI/CD: GitHub Actions ⚙️\n\n' +
+                'Your Browser:\n' +
+                '• Resolution: ' + window.innerWidth + ' x ' + window.innerHeight + '\n' +
+                '• Platform: ' + navigator.platform + '\n\n' +
+                'For more details, visit your Terraform configuration.');
+        }
+
+        function copyInfo() {
+            const hostname = window.location.hostname;
+            const info = `Azure Infrastructure Dashboard\n` +
+                `Cloud: Microsoft Azure\n` +
+                `Region: Central India\n` +
+                `VM Size: Standard_B2ats_v2\n` +
+                `OS: Ubuntu 22.04 LTS\n` +
+                `Web Server: NGINX\n` +
+                `IaC Tool: Terraform v1.9.8+\n` +
+                `CI/CD: GitHub Actions\n` +
+                `Environment: demo\n` +
+                `Host: ${hostname}\n` +
+                `Accessed: ${new Date().toLocaleString()}`;
+            
+            navigator.clipboard.writeText(info).then(() => {
+                alert('✓ Information copied to clipboard!');
+            }).catch(() => {
+                alert('Could not copy to clipboard');
+            });
+        }
+
+        // Add smooth scroll behavior
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        // Initialize on page load
+        window.addEventListener('load', initializeDeploymentTime);
+
+        // Add page visibility change detection
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                console.log('Page is now hidden');
+            } else {
+                console.log('Page is now visible');
+            }
+        });
+    </script>
 </body>
 </html>
